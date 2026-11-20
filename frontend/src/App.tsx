@@ -19,17 +19,46 @@ import {
   ArrowDownRight,
   PlusCircle,
   Copy,
-  Check
+  Check,
+  Calendar,
+  Users,
+  Gauge,
+  RotateCcw
 } from 'lucide-react';
+
+interface PeerData {
+  name: string;
+  pe?: number;
+  ev_sales?: number;
+  ev_ebitda?: number;
+  growth?: number;
+}
+
+interface LockinScheduleItem {
+  stage: string;
+  period: string;
+  category: string;
+  value_cr: number;
+  pct_of_issue: number;
+  status: string;
+  risk_flag: string;
+}
 
 interface IPOData {
   company_name: string;
   ticker: string;
+  sector?: string;
   price_band: string;
   issue_price: number;
   verdict: string;
   conviction_score: number;
   summary: string;
+  peers?: PeerData[];
+  ipo_multiples?: {
+    ev_sales?: number;
+    pe?: number;
+    ev_ebitda?: number;
+  };
   debate_stream: Array<{
     agent: string;
     role: string;
@@ -54,9 +83,11 @@ interface IPOData {
         day_90_unlock_cr: number;
         warning?: string;
       };
+      lockin_schedule?: LockinScheduleItem[];
       red_flags: string[];
     };
     spike_cone: {
+      issue_price?: number;
       gmp_in_rupees: number;
       gmp_pct: number;
       spike_probability_pct: number;
@@ -79,16 +110,21 @@ const SAMPLE_FALLBACKS: Record<string, IPOData> = {
   SWIGGY: {
     company_name: "Swiggy Limited",
     ticker: "SWIGGY",
+    sector: "Consumer Tech / Quick Commerce",
     price_band: "₹371 - ₹390",
     issue_price: 390.0,
     verdict: "TACTICAL SUBSCRIBE",
     conviction_score: 78,
     summary: "Subscribe strictly for Day-1 listing gains (+7.7% projected). Due to high OFS dilution (60.3%) and heavy Instamart burn, retail investors should book profits on listing day rather than holding through the T+30 anchor unlock cliff.",
+    peers: [
+      { name: "Zomato Ltd", pe: 115.0, ev_sales: 9.2, growth: 35.0 }
+    ],
+    ipo_multiples: { ev_sales: 6.8 },
     debate_stream: [
       {
         agent: "Valuation Auditor",
         role: "Fundamental Sanity",
-        message: "Swiggy is priced at ₹390 (EV/Sales ~6.8x), a ~25% discount to Zomato's 9.2x multiple. While operating losses persist (-₹2,350 Cr net loss), the price band leaves tactical listing room.",
+        message: "Swiggy is priced at ₹390 (EV/Sales ~6.8x), a ~26% discount to Zomato's 9.2x multiple. While operating losses persist (-₹2,350 Cr net loss), the price band leaves tactical listing room.",
         risk_level: "MODERATE"
       },
       {
@@ -128,6 +164,13 @@ const SAMPLE_FALLBACKS: Record<string, IPOData> = {
           day_90_unlock_cr: 2542.5,
           warning: "Watch for post-listing institutional selling pressure around T+30 and T+90 calendar days."
         },
+        lockin_schedule: [
+          { stage: "Day 0", period: "Listing Day", category: "Retail, NII & Floating QIB Quota", value_cr: 6242.0, pct_of_issue: 55.1, status: "IMMEDIATE_TRADING", risk_flag: "Active secondary price discovery" },
+          { stage: "Day 30", period: "T+30 Days", category: "50% Anchor Investor Quota", value_cr: 2542.5, pct_of_issue: 22.4, status: "SUPPLY_CLIFF", risk_flag: "Initial institutional supply shock" },
+          { stage: "Day 90", period: "T+90 Days", category: "Remaining 50% Anchor Quota", value_cr: 2542.5, pct_of_issue: 22.4, status: "SECONDARY_CLIFF", risk_flag: "Full anchor liquidity released" },
+          { stage: "Day 180", period: "T+180 Days", category: "Pre-IPO Non-Promoter Holding", value_cr: 2731.2, pct_of_issue: 24.1, status: "VENTURE_CAPITAL_UNLOCK", risk_flag: "Early PE investor unlock (Prosus, Softbank)" },
+          { stage: "Year 1 - 3", period: "T+365 to T+1095 Days", category: "Statutory Promoter Contribution", value_cr: 0.0, pct_of_issue: 0.0, status: "CORE_PROMOTER_LOCK", risk_flag: "Professionally run / zero promoter entity" }
+        ],
         red_flags: [
           "HIGH RISK: OFS ratio is 60.3% (>50%). Majority of public funds exit to selling shareholders rather than funding expansion capex."
         ]
@@ -157,11 +200,17 @@ const SAMPLE_FALLBACKS: Record<string, IPOData> = {
   HYUNDAI: {
     company_name: "Hyundai Motor India Limited",
     ticker: "HYUNDAI",
+    sector: "Automotive / Passenger Vehicles",
     price_band: "₹1865 - ₹1960",
     issue_price: 1960.0,
     verdict: "AVOID / FULLY PRICED",
     conviction_score: 88,
     summary: "Strong Avoid recommendation. 100% of this ₹27,870 Cr mega-offering is an Offer for Sale (OFS) cash-out to the Korean parent with zero capital entering India operations, compounded by a royalty hike.",
+    peers: [
+      { name: "Maruti Suzuki Ltd", pe: 26.5, ev_sales: 2.1, ev_ebitda: 18.2, growth: 12.0 },
+      { name: "Tata Motors Ltd", pe: 10.8, ev_sales: 0.8, ev_ebitda: 6.4, growth: 18.0 }
+    ],
+    ipo_multiples: { pe: 26.2, ev_ebitda: 17.8 },
     debate_stream: [
       {
         agent: "Valuation Auditor",
@@ -206,6 +255,13 @@ const SAMPLE_FALLBACKS: Record<string, IPOData> = {
           day_90_unlock_cr: 4157.5,
           warning: "Watch for post-listing institutional selling pressure around T+30 and T+90 calendar days."
         },
+        lockin_schedule: [
+          { stage: "Day 0", period: "Listing Day", category: "Retail & Floating Quota", value_cr: 19555.0, pct_of_issue: 70.2, status: "IMMEDIATE_TRADING", risk_flag: "Public float exposed to secondary market" },
+          { stage: "Day 30", period: "T+30 Days", category: "50% Anchor Investor Quota", value_cr: 4157.5, pct_of_issue: 14.9, status: "SUPPLY_CLIFF", risk_flag: "Massive ₹4,157 Cr supply unlock" },
+          { stage: "Day 90", period: "T+90 Days", category: "Remaining 50% Anchor Quota", value_cr: 4157.5, pct_of_issue: 14.9, status: "SECONDARY_CLIFF", risk_flag: "Final anchor supply unlock" },
+          { stage: "Day 180", period: "T+180 Days", category: "Pre-IPO Investor Release", value_cr: 0.0, pct_of_issue: 0.0, status: "VENTURE_CAPITAL_UNLOCK", risk_flag: "No pre-IPO PE investor base" },
+          { stage: "Year 1 - 3", period: "T+365 to T+1095 Days", category: "Promoter Retained Holding", value_cr: 41805.0, pct_of_issue: 82.5, status: "CORE_PROMOTER_LOCK", risk_flag: "Korean parent maintains 82.5% stake" }
+        ],
         red_flags: [
           "CRITICAL: 100.0% of issue is Offer for Sale (OFS). Zero capital enters Indian operations.",
           "Royalty rate paid to foreign parent increased from 0.65% to 1.50% of revenue."
@@ -236,11 +292,17 @@ const SAMPLE_FALLBACKS: Record<string, IPOData> = {
   OLA_ELEC: {
     company_name: "Ola Electric Mobility Limited",
     ticker: "OLAELEC",
+    sector: "Electric Vehicles (2-Wheelers)",
     price_band: "₹72 - ₹76",
     issue_price: 76.0,
     verdict: "HIGH SPECULATIVE RISK",
     conviction_score: 82,
     summary: "High forensic risk detected. Elevated accrual anomaly signals (Beneish M-Score: -1.605) combined with escalating consumer complaints and subsidy phase-out present acute long-term volatility.",
+    peers: [
+      { name: "TVS Motor Ltd", pe: 48.0, ev_sales: 3.2, growth: 15.0 },
+      { name: "Bajaj Auto Ltd", pe: 34.0, ev_sales: 4.1, growth: 14.0 }
+    ],
+    ipo_multiples: { ev_sales: 7.4 },
     debate_stream: [
       {
         agent: "Valuation Auditor",
@@ -285,6 +347,13 @@ const SAMPLE_FALLBACKS: Record<string, IPOData> = {
           day_90_unlock_cr: 1381.5,
           warning: "Watch for post-listing institutional selling pressure around T+30 and T+90 calendar days."
         },
+        lockin_schedule: [
+          { stage: "Day 0", period: "Listing Day", category: "Retail, NII & Float", value_cr: 3382.0, pct_of_issue: 55.0, status: "IMMEDIATE_TRADING", risk_flag: "Active retail trading float" },
+          { stage: "Day 30", period: "T+30 Days", category: "50% Anchor Investor Quota", value_cr: 1381.5, pct_of_issue: 22.5, status: "SUPPLY_CLIFF", risk_flag: "Anchor profit-taking window" },
+          { stage: "Day 90", period: "T+90 Days", category: "Remaining 50% Anchor Quota", value_cr: 1381.5, pct_of_issue: 22.5, status: "SECONDARY_CLIFF", risk_flag: "Final anchor liquidity release" },
+          { stage: "Day 180", period: "T+180 Days", category: "Pre-IPO Early Seed & Series Investors", value_cr: 258.0, pct_of_issue: 4.2, status: "VENTURE_CAPITAL_UNLOCK", risk_flag: "Secondary liquidity for early backers" },
+          { stage: "Year 1 - 3", period: "T+365 to T+1095 Days", category: "Promoter Bhavish Aggarwal Stake", value_cr: 2267.5, pct_of_issue: 36.9, status: "CORE_PROMOTER_LOCK", risk_flag: "Promoter holding locked per SEBI guidelines" }
+        ],
         red_flags: [
           "Promoter post-issue stake declines to 36.9%, diluting founder ownership.",
           "Altman Z'' distress metric at 0.84 indicates ongoing working capital vulnerability."
@@ -316,13 +385,31 @@ const SAMPLE_FALLBACKS: Record<string, IPOData> = {
 
 export default function App() {
   const [selectedKey, setSelectedKey] = useState<string>("SWIGGY");
-  const [activeTab, setActiveTab] = useState<"terminal" | "math" | "metrics">("terminal");
+  const [activeTab, setActiveTab] = useState<"terminal" | "math" | "peers" | "timeline" | "simulator">("terminal");
   const [data, setData] = useState<IPOData>(SAMPLE_FALLBACKS["SWIGGY"]);
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
   const [groqKey, setGroqKey] = useState<string>("");
   const [showKeyModal, setShowKeyModal] = useState<boolean>(false);
   const [showCustomModal, setShowCustomModal] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
+  const [selectedAgentFilter, setSelectedAgentFilter] = useState<string>("ALL");
+
+  // What-If Simulator Interactive State
+  const [simGmp, setSimGmp] = useState<number>(15);
+  const [simQibSub, setSimQibSub] = useState<number>(6.0);
+
+  // Sync simulator state when company changes
+  useEffect(() => {
+    setSimGmp(data.math_metrics.spike_cone.gmp_in_rupees || 0);
+  }, [data]);
+
+  // Compute dynamic simulation outputs
+  const simGmpPct = data.issue_price > 0 ? (simGmp / data.issue_price) * 100 : 0;
+  const simExpectedGainPct = Number(((simGmpPct * 0.70) + (Math.min(simQibSub, 50) * 0.25) - 2.0).toFixed(1));
+  const simExpectedPrice = Number((data.issue_price * (1 + simExpectedGainPct / 100)).toFixed(2));
+  const simBearishPrice = Number((data.issue_price * (1 + (simExpectedGainPct - 5.5) / 100)).toFixed(2));
+  const simBullishPrice = Number((data.issue_price * (1 + (simExpectedGainPct + 7.5) / 100)).toFixed(2));
+  const simProb = Math.min(Math.max(Math.round(40 + simGmpPct * 2.5 + simQibSub * 1.5), 5), 98);
 
   // Custom IPO Form State
   const [customForm, setCustomForm] = useState({
@@ -361,7 +448,7 @@ export default function App() {
     setTimeout(() => {
       setData(SAMPLE_FALLBACKS[key] || SAMPLE_FALLBACKS["SWIGGY"]);
       setIsAnalyzing(false);
-    }, 250);
+    }, 200);
   };
 
   // Submit custom IPO analysis
@@ -401,11 +488,17 @@ export default function App() {
     const customResult: IPOData = {
       company_name: customForm.company_name,
       ticker: customForm.ticker,
+      sector: customForm.sector,
       price_band: customForm.price_band,
       issue_price: customForm.issue_price,
       verdict: ofs_pct > 80 ? "AVOID / FULLY PRICED" : exp_gain > 5 ? "TACTICAL SUBSCRIBE" : "CAUTION / SELECTIVE APPLY",
       conviction_score: 80,
       summary: `Custom swarm evaluation for ${customForm.company_name}. Fresh issue dominates at ₹${customForm.fresh_issue_cr.toLocaleString()} Cr (${(100 - ofs_pct).toFixed(1)}%). GMP indicates a projected Day-1 return of +${exp_gain}%.`,
+      peers: [
+        { name: "Tata Power Co", pe: 38.0, ev_sales: 2.8, growth: 14.0 },
+        { name: "Adani Green Energy", pe: 110.0, ev_sales: 12.5, growth: 28.0 }
+      ],
+      ipo_multiples: { ev_sales: 3.1 },
       debate_stream: [
         {
           agent: "Valuation Auditor",
@@ -436,7 +529,8 @@ export default function App() {
         beneish: {
           m_score: -2.35,
           risk_classification: "LOW / STANDARD ACCRUAL PROFILE",
-          red_flags: []
+          red_flags: [],
+          ratios: { DSRI: 1.0, GMI: 1.0, AQI: 1.0, SGI: 1.15, DEPI: 1.0, SGAI: 0.95, TATA: 0.01, LVGI: 0.98 }
         },
         dilution: {
           total_issue_size_cr: total,
@@ -444,10 +538,17 @@ export default function App() {
           fresh_ratio_pct: Number((100 - ofs_pct).toFixed(1)),
           promoter_dilution_pct: Number((customForm.pre_promoter_holding_pct - customForm.post_promoter_holding_pct).toFixed(1)),
           anchor_cliff: {
+            anchor_book_cr: customForm.anchor_book_cr,
             day_30_unlock_cr: customForm.anchor_book_cr * 0.5,
             day_90_unlock_cr: customForm.anchor_book_cr * 0.5
           },
-          red_flags: ofs_pct > 50 ? ["Majority of proceeds exit to selling shareholders."] : []
+          lockin_schedule: [
+            { stage: "Day 0", period: "Listing Day", category: "Active Floating Quota", value_cr: total - customForm.anchor_book_cr, pct_of_issue: 60.4, status: "IMMEDIATE_TRADING", risk_flag: "Active secondary trading" },
+            { stage: "Day 30", period: "T+30 Days", category: "50% Anchor Investor Quota", value_cr: customForm.anchor_book_cr * 0.5, pct_of_issue: 19.8, status: "SUPPLY_CLIFF", risk_flag: "First anchor exit window" },
+            { stage: "Day 90", period: "T+90 Days", category: "Remaining Anchor Quota", value_cr: customForm.anchor_book_cr * 0.5, pct_of_issue: 19.8, status: "SECONDARY_CLIFF", risk_flag: "Full anchor liquidity released" },
+            { stage: "Year 1 - 3", period: "T+365 to T+1095 Days", category: "Promoter Quota (NTPC)", value_cr: 8900.0, pct_of_issue: 89.0, status: "CORE_PROMOTER_LOCK", risk_flag: "Sovereign parent alignment" }
+          ],
+          red_flags: ofs_pct > 50 ? ["OFS exceeds 50% of total offering."] : []
         },
         spike_cone: {
           gmp_in_rupees: customForm.gmp_rupees,
@@ -471,7 +572,7 @@ export default function App() {
     setTimeout(() => {
       setData(customResult);
       setIsAnalyzing(false);
-    }, 300);
+    }, 250);
   };
 
   const copyReportSummary = () => {
@@ -489,6 +590,15 @@ Autonomous Multi-Agent Analysis by Rohan Benegal (Roll No. 10170), Fr. CRCE.`;
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  // Filter debate stream
+  const filteredDebates = data.debate_stream.filter(d => {
+    if (selectedAgentFilter === "ALL") return true;
+    if (selectedAgentFilter === "VALUATION") return d.agent.includes("Valuation");
+    if (selectedAgentFilter === "DEMAND") return d.agent.includes("Demand");
+    if (selectedAgentFilter === "DILUTION") return d.agent.includes("Dilution");
+    return true;
+  });
 
   return (
     <div className="min-h-screen bg-[#070709] text-[#f4f4f5] font-sans antialiased selection:bg-white selection:text-black">
@@ -827,7 +937,7 @@ Autonomous Multi-Agent Analysis by Rohan Benegal (Roll No. 10170), Fr. CRCE.`;
         {/* MAIN TWO-COLUMN WORKSPACE */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
-          {/* LEFT 7 COLS: AGENT DEBATE & TERMINAL */}
+          {/* LEFT 7 COLS: AGENT DEBATE & WORKSPACE TABS */}
           <div className="lg:col-span-7 space-y-4">
             
             {/* ARBITER VERDICT HERO BANNER */}
@@ -877,35 +987,53 @@ Autonomous Multi-Agent Analysis by Rohan Benegal (Roll No. 10170), Fr. CRCE.`;
             </div>
 
             {/* TAB SELECTOR */}
-            <div className="flex space-x-2 border-b border-zinc-800 pb-1">
-              <button
-                onClick={() => setActiveTab("terminal")}
-                className={`px-3 py-1.5 text-xs font-mono flex items-center space-x-1.5 transition-all cursor-pointer ${
-                  activeTab === "terminal" 
-                    ? "border-b-2 border-white text-white font-bold" 
-                    : "text-zinc-500 hover:text-zinc-300"
-                }`}
-              >
-                <Terminal className="h-3.5 w-3.5" />
-                <span>AGENT DEBATE STREAM</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab("math")}
-                className={`px-3 py-1.5 text-xs font-mono flex items-center space-x-1.5 transition-all cursor-pointer ${
-                  activeTab === "math" 
-                    ? "border-b-2 border-white text-white font-bold" 
-                    : "text-zinc-500 hover:text-zinc-300"
-                }`}
-              >
-                <Scale className="h-3.5 w-3.5" />
-                <span>BENEISH & FORENSICS</span>
-              </button>
+            <div className="flex flex-wrap gap-1 border-b border-zinc-800 pb-1">
+              {[
+                { id: "terminal", label: "AGENT DEBATE", icon: Terminal },
+                { id: "math", label: "BENEISH FORENSICS", icon: Scale },
+                { id: "peers", label: "PEER MATRIX", icon: Users },
+                { id: "timeline", label: "LOCK-IN CLIFF", icon: Calendar },
+                { id: "simulator", label: "WHAT-IF SIMULATOR", icon: Gauge }
+              ].map(tab => {
+                const IconComponent = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id as any)}
+                    className={`px-3 py-1.5 text-xs font-mono flex items-center space-x-1.5 transition-all cursor-pointer ${
+                      activeTab === tab.id 
+                        ? "border-b-2 border-white text-white font-bold bg-[#141418] rounded-t" 
+                        : "text-zinc-500 hover:text-zinc-300"
+                    }`}
+                  >
+                    <IconComponent className="h-3.5 w-3.5" />
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
             </div>
 
-            {/* TAB CONTENT: DEBATE STREAM */}
+            {/* TAB 1: DEBATE STREAM */}
             {activeTab === "terminal" && (
               <div className="space-y-3">
+                {/* Agent Filters */}
+                <div className="flex items-center space-x-1 text-[11px] font-mono">
+                  <span className="text-zinc-500 mr-1.5">FILTER:</span>
+                  {["ALL", "VALUATION", "DEMAND", "DILUTION"].map(filter => (
+                    <button
+                      key={filter}
+                      onClick={() => setSelectedAgentFilter(filter)}
+                      className={`px-2 py-0.5 rounded cursor-pointer ${
+                        selectedAgentFilter === filter 
+                          ? "bg-white text-black font-bold" 
+                          : "text-zinc-400 hover:text-white bg-[#111114] border border-zinc-800"
+                      }`}
+                    >
+                      {filter}
+                    </button>
+                  ))}
+                </div>
+
                 {isAnalyzing ? (
                   <div className="sk-recessed p-8 text-center space-y-3">
                     <RefreshCw className="h-6 w-6 animate-spin text-white mx-auto" />
@@ -914,7 +1042,7 @@ Autonomous Multi-Agent Analysis by Rohan Benegal (Roll No. 10170), Fr. CRCE.`;
                     </div>
                   </div>
                 ) : (
-                  data.debate_stream.map((debate, idx) => (
+                  filteredDebates.map((debate, idx) => (
                     <div key={idx} className="sk-card p-4 space-y-2">
                       <div className="flex items-center justify-between text-xs font-mono">
                         <div className="flex items-center space-x-2">
@@ -939,7 +1067,7 @@ Autonomous Multi-Agent Analysis by Rohan Benegal (Roll No. 10170), Fr. CRCE.`;
               </div>
             )}
 
-            {/* TAB CONTENT: BENEISH MATHEMATICAL DECOMPOSITION */}
+            {/* TAB 2: BENEISH MATHEMATICAL DECOMPOSITION */}
             {activeTab === "math" && (
               <div className="sk-card p-5 space-y-4">
                 <div className="border-b border-zinc-800 pb-3">
@@ -963,6 +1091,209 @@ Autonomous Multi-Agent Analysis by Rohan Benegal (Roll No. 10170), Fr. CRCE.`;
                 <div className="border-t border-zinc-800 pt-3 flex items-center justify-between text-xs font-mono">
                   <span className="text-zinc-400">Calculated M-Score:</span>
                   <span className="font-bold text-white text-sm">{data.math_metrics.beneish.m_score}</span>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 3: LISTED PEER VALUATION MATRIX */}
+            {activeTab === "peers" && (
+              <div className="sk-card p-5 space-y-4">
+                <div className="border-b border-zinc-800 pb-3 flex justify-between items-center">
+                  <div>
+                    <div className="text-xs font-mono font-bold text-white flex items-center gap-1.5">
+                      <Users className="h-4 w-4" /> INDUSTRY PEER VALUATION BENCHMARKING
+                    </div>
+                    <div className="text-xs text-zinc-400 mt-0.5">
+                      Comparative multi-factor analysis against listed Indian benchmarks.
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-mono border border-zinc-800 px-2 py-0.5 rounded bg-black text-zinc-300">
+                    {data.sector || "General Industry"}
+                  </span>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs font-mono text-left">
+                    <thead>
+                      <tr className="border-b border-zinc-800 text-zinc-500 text-[10px]">
+                        <th className="py-2">COMPANY</th>
+                        <th className="py-2">P/E RATIO</th>
+                        <th className="py-2">EV / SALES</th>
+                        <th className="py-2">REV GROWTH</th>
+                        <th className="py-2">STATUS</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-zinc-900">
+                      {/* IPO Company Row */}
+                      <tr className="bg-[#18181d] text-white font-bold">
+                        <td className="py-2.5 flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
+                          <span>{data.ticker} (IPO)</span>
+                        </td>
+                        <td className="py-2.5">{data.ipo_multiples?.pe ? `${data.ipo_multiples.pe}x` : "Negative / N.A."}</td>
+                        <td className="py-2.5">{data.ipo_multiples?.ev_sales ? `${data.ipo_multiples.ev_sales}x` : "—"}</td>
+                        <td className="py-2.5">~35%</td>
+                        <td className="py-2.5">
+                          <span className="border border-white/60 px-1.5 py-0.5 rounded text-[10px] bg-black text-white">
+                            ISSUER
+                          </span>
+                        </td>
+                      </tr>
+                      {/* Peer Rows */}
+                      {(data.peers || []).map((peer, idx) => (
+                        <tr key={idx} className="text-zinc-300 hover:bg-[#111114]">
+                          <td className="py-2.5 text-zinc-200">{peer.name}</td>
+                          <td className="py-2.5">{peer.pe ? `${peer.pe}x` : "N.A."}</td>
+                          <td className="py-2.5">{peer.ev_sales ? `${peer.ev_sales}x` : (peer.ev_ebitda ? `${peer.ev_ebitda}x (EBITDA)` : "—")}</td>
+                          <td className="py-2.5">+{peer.growth}%</td>
+                          <td className="py-2.5">
+                            <span className="text-[10px] text-zinc-400 font-mono">LISTED BENCHMARK</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 4: SEBI REGULATORY LOCK-IN TIMELINE */}
+            {activeTab === "timeline" && (
+              <div className="sk-card p-5 space-y-4">
+                <div className="border-b border-zinc-800 pb-3 flex justify-between items-center">
+                  <div>
+                    <div className="text-xs font-mono font-bold text-white flex items-center gap-1.5">
+                      <Calendar className="h-4 w-4" /> SEBI STATUTORY LOCK-IN CLIFF TIMELINE
+                    </div>
+                    <div className="text-xs text-zinc-400 mt-0.5">
+                      Supply shock calendar mapping institutional share release per SEBI ICDR regulations.
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-mono border border-zinc-800 px-2 py-0.5 rounded bg-black text-zinc-300">
+                    SEBI ICDR 2024
+                  </span>
+                </div>
+
+                <div className="space-y-3">
+                  {(data.math_metrics.dilution.lockin_schedule || []).map((item, idx) => (
+                    <div key={idx} className="sk-recessed p-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                      <div className="space-y-0.5">
+                        <div className="flex items-center space-x-2 font-mono text-xs font-bold text-white">
+                          <span className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-200 text-[10px]">{item.stage}</span>
+                          <span>{item.category}</span>
+                        </div>
+                        <div className="text-[11px] text-zinc-400">{item.risk_flag}</div>
+                      </div>
+
+                      <div className="text-right sm:self-center font-mono text-xs">
+                        <div className="font-bold text-white">₹{item.value_cr.toLocaleString()} Cr</div>
+                        <div className="text-[10px] text-zinc-500">{item.pct_of_issue}% of Issue</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* TAB 5: WHAT-IF LISTING RETURN SIMULATOR */}
+            {activeTab === "simulator" && (
+              <div className="sk-card p-5 space-y-5">
+                <div className="border-b border-zinc-800 pb-3 flex justify-between items-center">
+                  <div>
+                    <div className="text-xs font-mono font-bold text-white flex items-center gap-1.5">
+                      <Gauge className="h-4 w-4" /> INTERACTIVE DAY-1 LISTING RETURN SIMULATOR
+                    </div>
+                    <div className="text-xs text-zinc-400 mt-0.5">
+                      Test hypothetical market conditions (GMP and institutional subscription shifts).
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      setSimGmp(data.math_metrics.spike_cone.gmp_in_rupees || 0);
+                      setSimQibSub(6.0);
+                    }}
+                    className="sk-btn-secondary px-2.5 py-1 text-[10px] font-mono flex items-center gap-1 text-zinc-400 hover:text-white cursor-pointer"
+                  >
+                    <RotateCcw className="h-3 w-3" /> RESET
+                  </button>
+                </div>
+
+                {/* Slider Controls */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between text-xs font-mono">
+                      <span className="text-zinc-400">GREY MARKET PREMIUM (GMP)</span>
+                      <span className="font-bold text-white">₹{simGmp} ({simGmpPct.toFixed(1)}%)</span>
+                    </div>
+                    <input 
+                      type="range" 
+                      min="-50" 
+                      max="150" 
+                      step="1"
+                      value={simGmp}
+                      onChange={(e) => setSimGmp(parseFloat(e.target.value))}
+                      className="w-full accent-white cursor-pointer"
+                    />
+                    <div className="flex justify-between text-[10px] font-mono text-zinc-600">
+                      <span>-₹50 (Discount)</span>
+                      <span>₹0</span>
+                      <span>+₹150 (Premium)</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between text-xs font-mono">
+                      <span className="text-zinc-400">QIB INSTITUTIONAL SUBSCRIPTION</span>
+                      <span className="font-bold text-white">{simQibSub.toFixed(1)}x</span>
+                    </div>
+                    <input 
+                      type="range" 
+                      min="0.1" 
+                      max="50" 
+                      step="0.5"
+                      value={simQibSub}
+                      onChange={(e) => setSimQibSub(parseFloat(e.target.value))}
+                      className="w-full accent-white cursor-pointer"
+                    />
+                    <div className="flex justify-between text-[10px] font-mono text-zinc-600">
+                      <span>0.1x (Undersubscribed)</span>
+                      <span>15x</span>
+                      <span>50x (Mega Frenzy)</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Live Simulated Cone Output */}
+                <div className="sk-recessed p-4 space-y-3">
+                  <div className="flex justify-between items-center text-xs font-mono">
+                    <span className="text-zinc-400">SIMULATED EXPECTED LISTING PRICE</span>
+                    <span className="text-lg font-bold text-white">₹{simExpectedPrice}</span>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2 text-center font-mono">
+                    <div className="p-2 border border-zinc-800 rounded bg-[#09090c]">
+                      <div className="text-[9px] text-zinc-500">BEARISH (P10)</div>
+                      <div className="text-xs font-bold text-zinc-300">₹{simBearishPrice}</div>
+                      <div className="text-[9px] text-zinc-500">({(simExpectedGainPct - 5.5).toFixed(1)}%)</div>
+                    </div>
+
+                    <div className="p-2 border border-zinc-700 rounded bg-[#121216]">
+                      <div className="text-[9px] text-white font-bold">EXPECTED</div>
+                      <div className="text-xs font-bold text-white">₹{simExpectedPrice}</div>
+                      <div className="text-[9px] text-zinc-300">(+{simExpectedGainPct}%)</div>
+                    </div>
+
+                    <div className="p-2 border border-zinc-800 rounded bg-[#09090c]">
+                      <div className="text-[9px] text-zinc-500">BULLISH (P90)</div>
+                      <div className="text-xs font-bold text-zinc-300">₹{simBullishPrice}</div>
+                      <div className="text-[9px] text-zinc-500">(+{(simExpectedGainPct + 7.5).toFixed(1)}%)</div>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-zinc-800 flex justify-between text-xs font-mono">
+                    <span className="text-zinc-500">Listing Spike Probability:</span>
+                    <span className="font-bold text-white">{simProb}%</span>
+                  </div>
                 </div>
               </div>
             )}

@@ -219,6 +219,13 @@ def analyze_ipo(ipo_data: Dict[str, Any], groq_api_key: str = None) -> Dict[str,
         "conviction_score": conviction,
         "summary": summary,
         "debate_stream": debate_records,
+        "sector": ipo_data.get("sector", "Core Financial / Industrial"),
+        "peers": ipo_data.get("peers", []),
+        "ipo_multiples": {
+            "ev_sales": ipo_data.get("ipo_ev_sales"),
+            "pe": ipo_data.get("ipo_pe"),
+            "ev_ebitda": ipo_data.get("ipo_ev_ebitda")
+        },
         "math_metrics": {
             "beneish": beneish_res,
             "dilution": dilution_res,
