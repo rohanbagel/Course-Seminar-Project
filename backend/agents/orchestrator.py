@@ -94,7 +94,11 @@ def analyze_ipo(ipo_data: Dict[str, Any], groq_api_key: str = None) -> Dict[str,
 
     # Step 1: Deterministic Mathematical Formulations
     beneish_res = calculate_beneish_m_score(**beneish_inputs) if beneish_inputs else {
-        "m_score": -2.15, "risk_classification": "LOW / STANDARD ACCRUAL PROFILE", "red_flags": []
+        "m_score": -2.15,
+        "is_high_risk": False,
+        "risk_classification": "LOW / STANDARD ACCRUAL PROFILE",
+        "red_flags": [],
+        "ratios": {"DSRI": 1.0, "GMI": 1.0, "AQI": 1.0, "SGI": 1.0, "DEPI": 1.0, "SGAI": 1.0, "TATA": 0.0, "LVGI": 1.0}
     }
     dilution_res = calculate_dilution_and_governance(
         fresh_issue_cr=fresh_cr,
@@ -172,7 +176,7 @@ def analyze_ipo(ipo_data: Dict[str, Any], groq_api_key: str = None) -> Dict[str,
     # Consensus Logic
     ofs_pct = dilution_res['ofs_ratio_pct']
     exp_gain = spike_res['listing_cone']['expected_gain_pct']
-    is_beneish_risk = beneish_res['is_high_risk']
+    is_beneish_risk = beneish_res.get('is_high_risk', False)
 
     if ofs_pct >= 90.0:
         verdict = "AVOID / FULLY PRICED"
