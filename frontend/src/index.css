@@ -113,3 +113,29 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #3f3f46;
 }
+
+/* Print Styles for Due-Diligence Dossier Export */
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+  header, footer, .no-print {
+    display: none !important;
+  }
+  .sk-card, .sk-recessed {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #d4d4d8 !important;
+    box-shadow: none !important;
+  }
+  .text-white, .text-zinc-300, .text-zinc-400 {
+    color: #18181b !important;
+  }
+  .text-zinc-500, .text-zinc-600 {
+    color: #52525b !important;
+  }
+  [class*="bg-"] {
+    background-color: #ffffff !important;
+  }
+}
