@@ -4,7 +4,6 @@
 > **Course Code:** `25SEM14CE01`  
 > **Institution:** Department of Computer Engineering, Fr. Conceicao Rodrigues College of Engineering (Fr. CRCE), University of Mumbai  
 > **Candidate:** Rohan Benegal (Roll No. 10170, Div: A)  
-> **Supervisor / HOD:** Dr. Sujata Deshmukh  
 
 ---
 
