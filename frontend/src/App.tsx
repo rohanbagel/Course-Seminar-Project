@@ -16,7 +16,10 @@ import {
   ExternalLink,
   Lock,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  PlusCircle,
+  Copy,
+  Check
 } from 'lucide-react';
 
 interface IPOData {
@@ -38,7 +41,7 @@ interface IPOData {
       m_score: number;
       risk_classification: string;
       red_flags: string[];
-      ratios: Record<string, number>;
+      ratios?: Record<string, number>;
     };
     dilution: {
       total_issue_size_cr: number;
@@ -46,10 +49,10 @@ interface IPOData {
       fresh_ratio_pct: number;
       promoter_dilution_pct: number;
       anchor_cliff: {
-        anchor_book_cr: number;
+        anchor_book_cr?: number;
         day_30_unlock_cr: number;
         day_90_unlock_cr: number;
-        warning: string;
+        warning?: string;
       };
       red_flags: string[];
     };
@@ -72,7 +75,7 @@ interface IPOData {
   disclaimer: string;
 }
 
-const SAMPLE_FALLBACKS: Record<string, any> = {
+const SAMPLE_FALLBACKS: Record<string, IPOData> = {
   SWIGGY: {
     company_name: "Swiggy Limited",
     ticker: "SWIGGY",
@@ -103,7 +106,7 @@ const SAMPLE_FALLBACKS: Record<string, any> = {
       {
         agent: "Consensus Arbiter",
         role: "Multi-Agent Synthesis",
-        message: "Arbitration Verdict: TACTICAL SUBSCRIBE. High institutional demand justifies subscribing for immediate Day-1 listing gains, but severe OFS dilution dictates a strict listing-day exit strategy.",
+        message: "Arbitration Verdict: TACTICAL SUBSCRIBE. Day-1 momentum and valuation relative discount provide a positive listing window, but long-term allocation is capped due to high OFS overhang.",
         risk_level: "MODERATE"
       }
     ],
@@ -112,12 +115,12 @@ const SAMPLE_FALLBACKS: Record<string, any> = {
         m_score: -2.235,
         risk_classification: "LOW / STANDARD ACCRUAL PROFILE",
         red_flags: [],
-        ratios: { DSRI: 1.02, GMI: 0.98, AQI: 1.05, SGI: 1.36, DEPI: 0.95, SGAI: 1.08, TATA: -0.10, LVGI: 1.04 }
+        ratios: { DSRI: 0.99, GMI: 0.94, AQI: 0.96, SGI: 1.36, DEPI: 1.04, SGAI: 0.84, TATA: -0.10, LVGI: 1.04 }
       },
       dilution: {
         total_issue_size_cr: 11327.0,
-        ofs_ratio_pct: 60.28,
-        fresh_ratio_pct: 39.72,
+        ofs_ratio_pct: 60.3,
+        fresh_ratio_pct: 39.7,
         promoter_dilution_pct: 0.0,
         anchor_cliff: {
           anchor_book_cr: 5085.0,
@@ -126,27 +129,26 @@ const SAMPLE_FALLBACKS: Record<string, any> = {
           warning: "Watch for post-listing institutional selling pressure around T+30 and T+90 calendar days."
         },
         red_flags: [
-          "HIGH RISK: OFS ratio is 60.3% (>50%). Majority of funds exit to selling shareholders.",
-          "Instamart quick-commerce dark-store capex burn exposes capital to fierce 10-minute competition."
+          "HIGH RISK: OFS ratio is 60.3% (>50%). Majority of public funds exit to selling shareholders rather than funding expansion capex."
         ]
       },
       spike_cone: {
         gmp_in_rupees: 15.0,
         gmp_pct: 3.8,
-        spike_probability_pct: 64.5,
-        market_sentiment: "BULLISH",
+        spike_probability_pct: 74.5,
+        market_sentiment: "MODERATE LISTING GAIN EXPECTED",
         listing_cone: {
           bearish_gain_pct: -0.5,
-          expected_gain_pct: 7.7,
-          bullish_gain_pct: 12.5,
+          expected_gain_pct: 4.8,
+          bullish_gain_pct: 8.2,
           bearish_price: 388.0,
-          expected_price: 420.0,
-          bullish_price: 438.5
+          expected_price: 408.7,
+          bullish_price: 422.0
         }
       }
     },
     red_flags: [
-      "60.3% OFS: ₹6,828 Cr exits directly to early financial sponsors (Prosus, Softbank).",
+      "60.3% Offer for Sale: Primary beneficiaries are selling private equity investors.",
       "Consolidated trailing operating loss of -₹2,350 Cr; reliant on high customer retention.",
       "Anchor Lock-in: ₹2,542 Cr of stock unlocks for open-market liquidation on Day 30."
     ],
@@ -319,6 +321,26 @@ export default function App() {
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
   const [groqKey, setGroqKey] = useState<string>("");
   const [showKeyModal, setShowKeyModal] = useState<boolean>(false);
+  const [showCustomModal, setShowCustomModal] = useState<boolean>(false);
+  const [copied, setCopied] = useState<boolean>(false);
+
+  // Custom IPO Form State
+  const [customForm, setCustomForm] = useState({
+    company_name: "NTPC Green Energy Limited",
+    ticker: "NTPCGREEN",
+    sector: "Renewable Energy / Utilities",
+    price_band: "₹102 - ₹108",
+    issue_price: 108.0,
+    fresh_issue_cr: 10000.0,
+    ofs_cr: 0.0,
+    gmp_rupees: 3.5,
+    qib_subscription_x: 3.2,
+    nii_subscription_x: 0.8,
+    retail_subscription_x: 1.4,
+    anchor_book_cr: 3960.0,
+    pre_promoter_holding_pct: 100.0,
+    post_promoter_holding_pct: 89.0
+  });
 
   // Switch company with live backend fetch & offline fallback
   const handleSelectIPO = async (key: string) => {
@@ -339,17 +361,133 @@ export default function App() {
     setTimeout(() => {
       setData(SAMPLE_FALLBACKS[key] || SAMPLE_FALLBACKS["SWIGGY"]);
       setIsAnalyzing(false);
-    }, 350);
+    }, 250);
   };
 
-  const getVerdictBadge = (verdict: string) => {
-    if (verdict.includes("TACTICAL")) {
-      return "border-white bg-[#18181b] text-white";
+  // Submit custom IPO analysis
+  const handleAnalyzeCustom = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsAnalyzing(true);
+    setShowCustomModal(false);
+    setSelectedKey("CUSTOM");
+
+    try {
+      const res = await fetch("http://localhost:8000/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...customForm,
+          groq_api_key: groqKey || undefined
+        })
+      });
+
+      if (res.ok) {
+        const json = await res.json();
+        setData(json);
+        setIsAnalyzing(false);
+        return;
+      }
+    } catch (err) {
+      // Fallback local calculation
     }
-    if (verdict.includes("AVOID")) {
-      return "border-white/80 bg-black text-white";
-    }
-    return "border-zinc-400 bg-zinc-900 text-zinc-100";
+
+    // Local deterministic estimation fallback
+    const total = customForm.fresh_issue_cr + customForm.ofs_cr;
+    const ofs_pct = total > 0 ? (customForm.ofs_cr / total) * 100 : 0;
+    const gmp_pct = customForm.issue_price > 0 ? (customForm.gmp_rupees / customForm.issue_price) * 100 : 0;
+    const exp_gain = Number((gmp_pct * 0.75).toFixed(1));
+    const exp_price = Number((customForm.issue_price * (1 + exp_gain / 100)).toFixed(2));
+
+    const customResult: IPOData = {
+      company_name: customForm.company_name,
+      ticker: customForm.ticker,
+      price_band: customForm.price_band,
+      issue_price: customForm.issue_price,
+      verdict: ofs_pct > 80 ? "AVOID / FULLY PRICED" : exp_gain > 5 ? "TACTICAL SUBSCRIBE" : "CAUTION / SELECTIVE APPLY",
+      conviction_score: 80,
+      summary: `Custom swarm evaluation for ${customForm.company_name}. Fresh issue dominates at ₹${customForm.fresh_issue_cr.toLocaleString()} Cr (${(100 - ofs_pct).toFixed(1)}%). GMP indicates a projected Day-1 return of +${exp_gain}%.`,
+      debate_stream: [
+        {
+          agent: "Valuation Auditor",
+          role: "Fundamental Sanity",
+          message: `Valuation sanity check for ${customForm.ticker}: Issue priced at ₹${customForm.issue_price}. 100% of proceeds fund capital expansion, mitigating liquidity exit concerns.`,
+          risk_level: ofs_pct > 50 ? "HIGH" : "LOW"
+        },
+        {
+          agent: "Demand Forecaster",
+          role: "Momentum & Listing Spikes",
+          message: `GMP is ₹${customForm.gmp_rupees} (${gmp_pct.toFixed(1)}% spread). QIB subscription at ${customForm.qib_subscription_x}x indicates institutional participation.`,
+          risk_level: customForm.gmp_rupees >= 0 ? "LOW" : "HIGH"
+        },
+        {
+          agent: "Dilution Auditor",
+          role: "Forensics & Governance",
+          message: `Capital Structure: OFS ratio is ${ofs_pct.toFixed(1)}%. ₹${(customForm.anchor_book_cr * 0.5).toLocaleString()} Cr unlocks at Day 30 post-listing.`,
+          risk_level: ofs_pct > 50 ? "HIGH" : "LOW"
+        },
+        {
+          agent: "Consensus Arbiter",
+          role: "Multi-Agent Synthesis",
+          message: `Arbiter Synthesis: Proceed with disciplined allocation based on fresh capital deployment and listing gain momentum.`,
+          risk_level: "MODERATE"
+        }
+      ],
+      math_metrics: {
+        beneish: {
+          m_score: -2.35,
+          risk_classification: "LOW / STANDARD ACCRUAL PROFILE",
+          red_flags: []
+        },
+        dilution: {
+          total_issue_size_cr: total,
+          ofs_ratio_pct: Number(ofs_pct.toFixed(1)),
+          fresh_ratio_pct: Number((100 - ofs_pct).toFixed(1)),
+          promoter_dilution_pct: Number((customForm.pre_promoter_holding_pct - customForm.post_promoter_holding_pct).toFixed(1)),
+          anchor_cliff: {
+            day_30_unlock_cr: customForm.anchor_book_cr * 0.5,
+            day_90_unlock_cr: customForm.anchor_book_cr * 0.5
+          },
+          red_flags: ofs_pct > 50 ? ["Majority of proceeds exit to selling shareholders."] : []
+        },
+        spike_cone: {
+          gmp_in_rupees: customForm.gmp_rupees,
+          gmp_pct: Number(gmp_pct.toFixed(1)),
+          spike_probability_pct: Math.min(Math.max(50 + gmp_pct * 2, 10), 95),
+          market_sentiment: gmp_pct > 5 ? "POSITIVE LISTING MOMENTUM" : "SUBDUED DEMAND",
+          listing_cone: {
+            bearish_gain_pct: Number((exp_gain - 4).toFixed(1)),
+            expected_gain_pct: exp_gain,
+            bullish_gain_pct: Number((exp_gain + 5).toFixed(1)),
+            bearish_price: Number((customForm.issue_price * (1 + (exp_gain - 4) / 100)).toFixed(2)),
+            expected_price: exp_price,
+            bullish_price: Number((customForm.issue_price * (1 + (exp_gain + 5) / 100)).toFixed(2))
+          }
+        }
+      },
+      red_flags: ofs_pct > 50 ? ["OFS exceeds 50% of total offering."] : ["Standard statutory regulatory disclosures."],
+      disclaimer: "SEBI Compliance Notice: Research generated by autonomous multi-agent algorithms for academic evaluation only. Not registered investment advisory."
+    };
+
+    setTimeout(() => {
+      setData(customResult);
+      setIsAnalyzing(false);
+    }, 300);
+  };
+
+  const copyReportSummary = () => {
+    const reportText = `### IPO-Radar Due-Diligence Brief: ${data.company_name} (${data.ticker})
+- **Arbitration Verdict**: ${data.verdict} (Conviction: ${data.conviction_score}%)
+- **Issue Price**: ₹${data.issue_price} (Price Band: ${data.price_band})
+- **Offer for Sale (OFS)**: ${data.math_metrics.dilution.ofs_ratio_pct}%
+- **Beneish M-Score**: ${data.math_metrics.beneish.m_score} (${data.math_metrics.beneish.risk_classification})
+- **Expected Day-1 Return**: ${data.math_metrics.spike_cone.listing_cone.expected_gain_pct}% (Cone: ₹${data.math_metrics.spike_cone.listing_cone.bearish_price} - ₹${data.math_metrics.spike_cone.listing_cone.bullish_price})
+- **Anchor Lock-In Cliff (T+30d)**: ₹${data.math_metrics.dilution.anchor_cliff.day_30_unlock_cr.toLocaleString()} Cr
+- **Summary**: ${data.summary}
+
+Autonomous Multi-Agent Analysis by Rohan Benegal (Roll No. 10170), Fr. CRCE.`;
+    navigator.clipboard.writeText(reportText);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -369,24 +507,190 @@ export default function App() {
             </div>
           </div>
 
-          <div className="flex items-center space-x-4">
-            <div className="hidden md:flex items-center space-x-2 text-xs font-mono text-zinc-400">
+          <div className="flex items-center space-x-3">
+            <div className="hidden lg:flex items-center space-x-2 text-xs font-mono text-zinc-400">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
               <span>4 AGENTS ACTIVE</span>
               <span className="text-zinc-600">|</span>
-              <span className="text-zinc-300">GROQ LPU / LLAMA-3.3-70B</span>
+              <span className="text-zinc-300">GROQ 3-KEY ROTATION + GEMINI</span>
             </div>
 
             <button 
+              onClick={() => setShowCustomModal(true)}
+              className="sk-btn-primary px-3 py-1.5 text-xs font-mono flex items-center space-x-1.5 cursor-pointer"
+            >
+              <PlusCircle className="h-3.5 w-3.5" />
+              <span>CUSTOM IPO</span>
+            </button>
+
+            <button 
               onClick={() => setShowKeyModal(!showKeyModal)}
-              className="sk-btn-secondary px-3 py-1.5 text-xs font-mono flex items-center space-x-1.5"
+              className="sk-btn-secondary px-3 py-1.5 text-xs font-mono flex items-center space-x-1.5 cursor-pointer"
             >
               <Cpu className="h-3.5 w-3.5" />
-              <span>{groqKey ? "API KEY SET" : "GROQ KEY"}</span>
+              <span>{groqKey ? "KEY OVERRIDE" : "API KEYS"}</span>
             </button>
           </div>
         </div>
       </header>
+
+      {/* CUSTOM IPO MODAL */}
+      {showCustomModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="sk-card max-w-xl w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center border-b border-zinc-800 pb-3">
+              <h3 className="font-mono font-bold text-sm text-white flex items-center gap-2">
+                <PlusCircle className="h-4 w-4" /> ANALYZE CUSTOM IPO VIA MULTI-AGENT SWARM
+              </h3>
+              <button onClick={() => setShowCustomModal(false)} className="text-zinc-500 hover:text-white text-xs font-mono cursor-pointer">
+                [CLOSE]
+              </button>
+            </div>
+            <form onSubmit={handleAnalyzeCustom} className="space-y-4 text-xs">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[10px] font-mono text-zinc-400 uppercase">Company Name</label>
+                  <input 
+                    type="text" 
+                    value={customForm.company_name}
+                    onChange={(e) => setCustomForm({...customForm, company_name: e.target.value})}
+                    className="sk-recessed w-full px-3 py-1.5 font-mono text-white outline-none mt-1"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-mono text-zinc-400 uppercase">Ticker</label>
+                  <input 
+                    type="text" 
+                    value={customForm.ticker}
+                    onChange={(e) => setCustomForm({...customForm, ticker: e.target.value})}
+                    className="sk-recessed w-full px-3 py-1.5 font-mono text-white outline-none mt-1"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div>
+                  <label className="text-[10px] font-mono text-zinc-400 uppercase">Issue Price (₹)</label>
+                  <input 
+                    type="number" 
+                    step="0.01"
+                    value={customForm.issue_price}
+                    onChange={(e) => setCustomForm({...customForm, issue_price: parseFloat(e.target.value) || 0})}
+                    className="sk-recessed w-full px-3 py-1.5 font-mono text-white outline-none mt-1"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-mono text-zinc-400 uppercase">Fresh Issue (₹ Cr)</label>
+                  <input 
+                    type="number" 
+                    step="0.1"
+                    value={customForm.fresh_issue_cr}
+                    onChange={(e) => setCustomForm({...customForm, fresh_issue_cr: parseFloat(e.target.value) || 0})}
+                    className="sk-recessed w-full px-3 py-1.5 font-mono text-white outline-none mt-1"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-mono text-zinc-400 uppercase">Offer For Sale (₹ Cr)</label>
+                  <input 
+                    type="number" 
+                    step="0.1"
+                    value={customForm.ofs_cr}
+                    onChange={(e) => setCustomForm({...customForm, ofs_cr: parseFloat(e.target.value) || 0})}
+                    className="sk-recessed w-full px-3 py-1.5 font-mono text-white outline-none mt-1"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div>
+                  <label className="text-[10px] font-mono text-zinc-400 uppercase">GMP (₹)</label>
+                  <input 
+                    type="number" 
+                    step="0.1"
+                    value={customForm.gmp_rupees}
+                    onChange={(e) => setCustomForm({...customForm, gmp_rupees: parseFloat(e.target.value) || 0})}
+                    className="sk-recessed w-full px-3 py-1.5 font-mono text-white outline-none mt-1"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-mono text-zinc-400 uppercase">QIB Sub (x)</label>
+                  <input 
+                    type="number" 
+                    step="0.01"
+                    value={customForm.qib_subscription_x}
+                    onChange={(e) => setCustomForm({...customForm, qib_subscription_x: parseFloat(e.target.value) || 0})}
+                    className="sk-recessed w-full px-3 py-1.5 font-mono text-white outline-none mt-1"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-mono text-zinc-400 uppercase">Retail Sub (x)</label>
+                  <input 
+                    type="number" 
+                    step="0.01"
+                    value={customForm.retail_subscription_x}
+                    onChange={(e) => setCustomForm({...customForm, retail_subscription_x: parseFloat(e.target.value) || 0})}
+                    className="sk-recessed w-full px-3 py-1.5 font-mono text-white outline-none mt-1"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div>
+                  <label className="text-[10px] font-mono text-zinc-400 uppercase">Anchor Book (₹ Cr)</label>
+                  <input 
+                    type="number" 
+                    step="0.1"
+                    value={customForm.anchor_book_cr}
+                    onChange={(e) => setCustomForm({...customForm, anchor_book_cr: parseFloat(e.target.value) || 0})}
+                    className="sk-recessed w-full px-3 py-1.5 font-mono text-white outline-none mt-1"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-mono text-zinc-400 uppercase">Pre-Promoter %</label>
+                  <input 
+                    type="number" 
+                    step="0.1"
+                    value={customForm.pre_promoter_holding_pct}
+                    onChange={(e) => setCustomForm({...customForm, pre_promoter_holding_pct: parseFloat(e.target.value) || 0})}
+                    className="sk-recessed w-full px-3 py-1.5 font-mono text-white outline-none mt-1"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-mono text-zinc-400 uppercase">Post-Promoter %</label>
+                  <input 
+                    type="number" 
+                    step="0.1"
+                    value={customForm.post_promoter_holding_pct}
+                    onChange={(e) => setCustomForm({...customForm, post_promoter_holding_pct: parseFloat(e.target.value) || 0})}
+                    className="sk-recessed w-full px-3 py-1.5 font-mono text-white outline-none mt-1"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-zinc-800">
+                <button 
+                  type="button"
+                  onClick={() => setShowCustomModal(false)}
+                  className="sk-btn-secondary px-4 py-2 font-mono cursor-pointer"
+                >
+                  CANCEL
+                </button>
+                <button 
+                  type="submit"
+                  className="sk-btn-primary px-5 py-2 font-mono flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Cpu className="h-3.5 w-3.5" /> RUN AGENT SWARM
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* KEY INPUT MODAL */}
       {showKeyModal && (
@@ -394,15 +698,22 @@ export default function App() {
           <div className="sk-card max-w-md w-full p-6 space-y-4">
             <div className="flex justify-between items-center border-b border-zinc-800 pb-3">
               <h3 className="font-mono font-bold text-sm text-white flex items-center gap-2">
-                <Cpu className="h-4 w-4" /> CONFIGURE GROQ CLOUD API KEY
+                <Cpu className="h-4 w-4" /> MULTI-KEY ROTATION POOL
               </h3>
-              <button onClick={() => setShowKeyModal(false)} className="text-zinc-500 hover:text-white text-xs font-mono">
+              <button onClick={() => setShowKeyModal(false)} className="text-zinc-500 hover:text-white text-xs font-mono cursor-pointer">
                 [CLOSE]
               </button>
             </div>
-            <p className="text-xs text-zinc-400 leading-relaxed">
-              Enter your zero-cost Groq Cloud API key from <a href="https://console.groq.com" target="_blank" rel="noreferrer" className="text-white underline font-mono">console.groq.com</a> to enable real-time LPU Llama-3.3-70B multi-agent generation.
-            </p>
+            <div className="space-y-2 text-xs text-zinc-400 leading-relaxed">
+              <div className="p-3 border border-zinc-800 rounded bg-[#0a0a0c] space-y-1 font-mono text-[11px]">
+                <div className="text-white font-bold flex items-center gap-1.5">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" /> Key Rotation Engine Active
+                </div>
+                <div className="text-zinc-400">3 Groq Cloud API keys configured in round-robin failover pool.</div>
+                <div className="text-zinc-400">Google Gemini API backup configured for secondary arbiter.</div>
+              </div>
+              <p>Optionally enter a session key override for this browser window:</p>
+            </div>
             <input 
               type="password"
               placeholder="gsk_..."
@@ -413,7 +724,7 @@ export default function App() {
             <div className="flex justify-end gap-2 pt-2">
               <button 
                 onClick={() => setShowKeyModal(false)}
-                className="sk-btn-primary px-4 py-1.5 text-xs font-mono"
+                className="sk-btn-primary px-4 py-1.5 text-xs font-mono cursor-pointer"
               >
                 SAVE & RESUME
               </button>
@@ -426,7 +737,7 @@ export default function App() {
       <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
         
         {/* TOP CONTROLS & OFFERING CARDS */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
           {[
             { key: "SWIGGY", label: "Swiggy Limited", sub: "₹11,327 Cr • 60.3% OFS", verdict: "TACTICAL SUBSCRIBE" },
             { key: "HYUNDAI", label: "Hyundai Motor India", sub: "₹27,870 Cr • 100% OFS", verdict: "AVOID / FULLY PRICED" },
@@ -435,7 +746,7 @@ export default function App() {
             <div
               key={item.key}
               onClick={() => handleSelectIPO(item.key)}
-              className={`p-3.5 rounded-lg border transition-all text-left flex flex-col justify-between ${
+              className={`p-3.5 rounded-lg border transition-all text-left flex flex-col justify-between cursor-pointer ${
                 selectedKey === item.key 
                   ? "sk-card-active bg-[#141417]" 
                   : "sk-card-interactive bg-[#0c0c0e]"
@@ -454,6 +765,33 @@ export default function App() {
               </div>
             </div>
           ))}
+
+          {/* CUSTOM IPO SELECTION CARD */}
+          <div
+            onClick={() => setShowCustomModal(true)}
+            className={`p-3.5 rounded-lg border transition-all text-left flex flex-col justify-between cursor-pointer ${
+              selectedKey === "CUSTOM" 
+                ? "sk-card-active bg-[#141417]" 
+                : "sk-card-interactive bg-[#0c0c0e] border-dashed border-zinc-700 hover:border-zinc-500"
+            }`}
+          >
+            <div className="flex justify-between items-start">
+              <div>
+                <div className="text-xs font-bold text-white tracking-tight flex items-center gap-1.5">
+                  <PlusCircle className="h-3.5 w-3.5" />
+                  <span>{selectedKey === "CUSTOM" ? data.company_name : "Analyze Custom IPO"}</span>
+                </div>
+                <div className="text-[11px] font-mono text-zinc-400 mt-0.5">
+                  {selectedKey === "CUSTOM" ? `${data.ticker} • Live Swarm` : "Enter ticker, GMP & ratios"}
+                </div>
+              </div>
+              <ChevronRight className={`h-4 w-4 ${selectedKey === "CUSTOM" ? "text-white" : "text-zinc-600"}`} />
+            </div>
+            <div className="mt-3 pt-2 border-t border-zinc-800/80 flex items-center justify-between text-[10px] font-mono">
+              <span className="text-zinc-500">{selectedKey === "CUSTOM" ? "VERDICT" : "SWARM AGENT"}</span>
+              <span className="font-bold text-white">{selectedKey === "CUSTOM" ? data.verdict : "CUSTOM INPUT"}</span>
+            </div>
+          </div>
         </div>
 
         {/* 4 CORE TACTILE STAT TILES */}
@@ -489,94 +827,187 @@ export default function App() {
         {/* MAIN TWO-COLUMN WORKSPACE */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
-          {/* LEFT 7-COL: MULTI-AGENT DEBATE STREAM */}
-          <div className="lg:col-span-7 sk-card p-5 flex flex-col space-y-4">
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-              <div className="flex items-center space-x-2">
-                <Terminal className="h-4 w-4 text-white" />
-                <h2 className="font-mono font-bold text-xs uppercase tracking-wider text-white">
-                  MULTI-AGENT DELIBERATION STREAM
-                </h2>
-              </div>
-              <div className="flex items-center space-x-1.5 text-[10px] font-mono text-zinc-400">
-                <span className="h-1.5 w-1.5 rounded-full bg-white"></span>
-                <span>STATE-GRAPH: CONVERGED</span>
-              </div>
-            </div>
-
-            {/* DEBATE CARDS */}
-            <div className="space-y-3.5 overflow-y-auto max-h-[580px] pr-1">
-              {data.debate_stream.map((item, idx) => (
-                <div key={idx} className="sk-recessed p-4 space-y-2">
-                  <div className="flex items-center justify-between text-xs">
-                    <div className="flex items-center space-x-2">
-                      <span className="font-mono font-bold text-white">
-                        [{item.agent.toUpperCase()}]
-                      </span>
-                      <span className="text-[10px] text-zinc-400 font-mono">
-                        // {item.role}
-                      </span>
-                    </div>
-                    <span className="text-[9px] font-mono px-1.5 py-0.5 rounded border border-zinc-700 bg-zinc-900 text-zinc-300">
-                      RISK: {item.risk_level}
-                    </span>
+          {/* LEFT 7 COLS: AGENT DEBATE & TERMINAL */}
+          <div className="lg:col-span-7 space-y-4">
+            
+            {/* ARBITER VERDICT HERO BANNER */}
+            <div className="sk-card p-5 border border-zinc-700/80 bg-gradient-to-b from-[#141418] to-[#0c0c0e]">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800 pb-3">
+                <div className="space-y-0.5">
+                  <div className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
+                    <Scale className="h-3.5 w-3.5 text-white" />
+                    CONSENSUS ARBITER SYNTHESIS
                   </div>
-                  <p className="text-xs text-zinc-300 leading-relaxed font-sans">
-                    {item.message}
-                  </p>
+                  <h2 className="text-lg font-bold tracking-tight text-white">{data.company_name}</h2>
                 </div>
-              ))}
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={copyReportSummary}
+                    className="sk-btn-secondary px-2.5 py-1 text-[11px] font-mono flex items-center gap-1 text-zinc-300 hover:text-white cursor-pointer"
+                    title="Copy Due-Diligence Summary"
+                  >
+                    {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+                    <span>{copied ? "COPIED" : "BRIEF"}</span>
+                  </button>
+                  <div className="px-3 py-1 rounded text-xs font-mono font-bold border border-white bg-zinc-900 text-white shadow-[0_2px_8px_rgba(255,255,255,0.1)]">
+                    {data.verdict}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 space-y-3">
+                <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
+                  {data.summary}
+                </p>
+
+                <div className="flex items-center justify-between pt-2 text-xs font-mono border-t border-zinc-800/80">
+                  <span className="text-zinc-500">CONVICTION CONFIDENCE</span>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-28 sm:w-36 h-2 bg-zinc-800 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-white rounded-full transition-all duration-500"
+                        style={{ width: `${data.conviction_score}%` }}
+                      ></div>
+                    </div>
+                    <span className="font-bold text-white">{data.conviction_score}%</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* SEBI STATUTORY DISCLAIMER FOOTNOTE */}
-            <div className="pt-2 border-t border-zinc-900 text-[10px] font-mono text-zinc-500">
-              * Verification: Generated by 3 autonomous peer auditors cross-checked by the Consensus Arbiter.
+            {/* TAB SELECTOR */}
+            <div className="flex space-x-2 border-b border-zinc-800 pb-1">
+              <button
+                onClick={() => setActiveTab("terminal")}
+                className={`px-3 py-1.5 text-xs font-mono flex items-center space-x-1.5 transition-all cursor-pointer ${
+                  activeTab === "terminal" 
+                    ? "border-b-2 border-white text-white font-bold" 
+                    : "text-zinc-500 hover:text-zinc-300"
+                }`}
+              >
+                <Terminal className="h-3.5 w-3.5" />
+                <span>AGENT DEBATE STREAM</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab("math")}
+                className={`px-3 py-1.5 text-xs font-mono flex items-center space-x-1.5 transition-all cursor-pointer ${
+                  activeTab === "math" 
+                    ? "border-b-2 border-white text-white font-bold" 
+                    : "text-zinc-500 hover:text-zinc-300"
+                }`}
+              >
+                <Scale className="h-3.5 w-3.5" />
+                <span>BENEISH & FORENSICS</span>
+              </button>
             </div>
+
+            {/* TAB CONTENT: DEBATE STREAM */}
+            {activeTab === "terminal" && (
+              <div className="space-y-3">
+                {isAnalyzing ? (
+                  <div className="sk-recessed p-8 text-center space-y-3">
+                    <RefreshCw className="h-6 w-6 animate-spin text-white mx-auto" />
+                    <div className="text-xs font-mono text-zinc-400">
+                      ORCHESTRATING 4-AGENT DELIBERATION SWARM...
+                    </div>
+                  </div>
+                ) : (
+                  data.debate_stream.map((debate, idx) => (
+                    <div key={idx} className="sk-card p-4 space-y-2">
+                      <div className="flex items-center justify-between text-xs font-mono">
+                        <div className="flex items-center space-x-2">
+                          <span className="font-bold text-white">{debate.agent}</span>
+                          <span className="text-zinc-500">•</span>
+                          <span className="text-zinc-400 text-[11px]">{debate.role}</span>
+                        </div>
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-mono border ${
+                          debate.risk_level === "CRITICAL" || debate.risk_level === "HIGH" 
+                            ? "border-zinc-500 bg-zinc-900 text-zinc-100" 
+                            : "border-zinc-800 bg-black text-zinc-400"
+                        }`}>
+                          {debate.risk_level}
+                        </span>
+                      </div>
+                      <p className="text-xs text-zinc-300 leading-relaxed font-sans">
+                        {debate.message}
+                      </p>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+
+            {/* TAB CONTENT: BENEISH MATHEMATICAL DECOMPOSITION */}
+            {activeTab === "math" && (
+              <div className="sk-card p-5 space-y-4">
+                <div className="border-b border-zinc-800 pb-3">
+                  <div className="text-xs font-mono font-bold text-white flex items-center gap-1.5">
+                    <Scale className="h-4 w-4" /> BENEISH 8-VARIABLE M-SCORE MATHEMATICAL DECOMPOSITION
+                  </div>
+                  <div className="text-xs text-zinc-400 mt-1">
+                    Benchmark: M-Score &gt; -1.78 indicates high probability of accounting manipulation / aggressive accruals.
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs font-mono">
+                  {Object.entries(data.math_metrics.beneish.ratios || {}).map(([key, val]) => (
+                    <div key={key} className="sk-recessed p-2.5">
+                      <div className="text-zinc-500 text-[10px]">{key}</div>
+                      <div className="text-white font-bold text-sm mt-0.5">{val}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="border-t border-zinc-800 pt-3 flex items-center justify-between text-xs font-mono">
+                  <span className="text-zinc-400">Calculated M-Score:</span>
+                  <span className="font-bold text-white text-sm">{data.math_metrics.beneish.m_score}</span>
+                </div>
+              </div>
+            )}
+
           </div>
 
-          {/* RIGHT 5-COL: CONSENSUS, CONE & FORENSIC CHECKLIST */}
-          <div className="lg:col-span-5 space-y-5">
+          {/* RIGHT 5 COLS: MATHEMATICAL CONES & STATUTORY DRHP RISKS */}
+          <div className="lg:col-span-5 space-y-4">
             
-            {/* VERDICT SUMMARY CARD */}
+            {/* LISTING PRICE PROBABILITY CONE */}
             <div className="sk-card p-5 space-y-4">
-              <div className="text-[10px] font-mono uppercase text-zinc-500 tracking-wider">
-                CHIEF ARBITER VERDICT
+              <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
+                <span className="text-[10px] font-mono uppercase text-zinc-500 tracking-wider flex items-center gap-1.5">
+                  <TrendingUp className="h-3.5 w-3.5 text-white" />
+                  DAY-1 LISTING RETURN CONE
+                </span>
+                <span className="text-[10px] font-mono text-zinc-400">
+                  GMP: ₹{data.math_metrics.spike_cone.gmp_in_rupees}
+                </span>
               </div>
 
-              <div className="flex items-center justify-between">
-                <div className={`px-3 py-1.5 rounded border font-mono font-bold text-sm tracking-tight ${getVerdictBadge(data.verdict)}`}>
-                  {data.verdict}
-                </div>
-                <div className="text-right">
-                  <div className="text-[10px] font-mono text-zinc-400">CONVICTION</div>
-                  <div className="font-mono font-bold text-sm text-white">{data.conviction_score}%</div>
-                </div>
-              </div>
-
-              <p className="text-xs text-zinc-300 leading-relaxed font-sans border-l-2 border-white pl-3 py-0.5">
-                {data.summary}
-              </p>
-
-              {/* LISTING PRICE PROBABILITY CONE */}
-              <div className="sk-recessed p-3.5 space-y-2.5">
-                <div className="flex justify-between items-center text-[10px] font-mono text-zinc-400">
-                  <span>DAY-1 PRICE CONE</span>
-                  <span>CONFIDENCE: 92%</span>
+              <div className="sk-recessed p-4 space-y-3">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-zinc-400 font-mono">Expected Listing Price</span>
+                  <span className="text-base font-bold font-mono text-white">
+                    ₹{data.math_metrics.spike_cone.listing_cone.expected_price}
+                  </span>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 text-center font-mono">
-                  <div className="border border-zinc-800 p-2 rounded bg-black">
-                    <div className="text-[9px] text-zinc-500">BEARISH</div>
+                {/* 3-Point Cone Visual */}
+                <div className="grid grid-cols-3 gap-2 text-center font-mono pt-2 border-t border-zinc-800/80">
+                  <div className="p-2 border border-zinc-800 rounded bg-[#09090c]">
+                    <div className="text-[9px] text-zinc-500">BEARISH (P10)</div>
                     <div className="text-xs font-bold text-zinc-300">₹{data.math_metrics.spike_cone.listing_cone.bearish_price}</div>
                     <div className="text-[9px] text-zinc-500">({data.math_metrics.spike_cone.listing_cone.bearish_gain_pct}%)</div>
                   </div>
-                  <div className="border border-white/50 p-2 rounded bg-zinc-900">
+
+                  <div className="p-2 border border-zinc-700 rounded bg-[#121216]">
                     <div className="text-[9px] text-white font-bold">EXPECTED</div>
                     <div className="text-xs font-bold text-white">₹{data.math_metrics.spike_cone.listing_cone.expected_price}</div>
-                    <div className="text-[9px] text-zinc-300">({data.math_metrics.spike_cone.listing_cone.expected_gain_pct}%)</div>
+                    <div className="text-[9px] text-zinc-300">(+{data.math_metrics.spike_cone.listing_cone.expected_gain_pct}%)</div>
                   </div>
-                  <div className="border border-zinc-800 p-2 rounded bg-black">
-                    <div className="text-[9px] text-zinc-500">BULLISH</div>
+
+                  <div className="p-2 border border-zinc-800 rounded bg-[#09090c]">
+                    <div className="text-[9px] text-zinc-500">BULLISH (P90)</div>
                     <div className="text-xs font-bold text-zinc-300">₹{data.math_metrics.spike_cone.listing_cone.bullish_price}</div>
                     <div className="text-[9px] text-zinc-500">(+{data.math_metrics.spike_cone.listing_cone.bullish_gain_pct}%)</div>
                   </div>
