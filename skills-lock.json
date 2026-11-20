@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "skills": {
+    "design-taste-frontend": {
+      "source": "wrestle-R/Mbappe-Special",
+      "sourceType": "github",
+      "skillPath": "skills/leonxlnx/design-taste-frontend/SKILL.md",
+      "computedHash": "0641dec1a1300323bbc9b5fb53ae93498b734fa90e5e295f6e20f113fb9773ca"
+    },
+    "eyes-of-render": {
+      "source": "wrestle-R/Mbappe-Special",
+      "sourceType": "github",
+      "skillPath": "skills/russel/eyes-of-render/SKILL.md",
+      "computedHash": "da75dcff3e75414d001057d10240729b8355562298313496264798d8ea5aa0bc"
+    },
+    "frontend-design": {
+      "source": "wrestle-R/Mbappe-Special",
+      "sourceType": "github",
+      "skillPath": "skills/anthropic/frontend-design/SKILL.md",
+      "computedHash": "d3d7e8d1d379a1f926a582752148d205a8ff70abd34e38372f74253cd862ffb9"
+    },
+    "skeuomorphism-ui": {
+      "source": "wrestle-R/Mbappe-Special",
+      "sourceType": "github",
+      "skillPath": "skills/russel/skeuomorphism-ui/SKILL.md",
+      "computedHash": "5599c31fcce169e6641351b21791b4080e2b94c3242e8e56602b401a5a31660e"
+    }
+  }
+}

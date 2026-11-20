@@ -1,0 +1,115 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-main: #09090b;
+    --bg-card: #121215;
+    --bg-subtle: #18181b;
+    --border-dim: #27272a;
+    --border-bright: #3f3f46;
+    --text-primary: #f4f4f5;
+    --text-secondary: #a1a1aa;
+    --text-muted: #71717a;
+  }
+
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    letter-spacing: -0.01em;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
+}
+
+/* Tactile Skeuomorphic Monochrome Styles */
+.sk-card {
+  background-color: #111114;
+  border: 1px solid #27272a;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+}
+
+.sk-card-interactive {
+  background-color: #111114;
+  border: 1px solid #27272a;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: all 0.15s ease-in-out;
+  cursor: pointer;
+}
+
+.sk-card-interactive:hover {
+  border-color: #52525b;
+  transform: translateY(-1px);
+}
+
+.sk-card-active {
+  background-color: #18181b;
+  border-color: #f4f4f5;
+  box-shadow: 0 0 0 1px #f4f4f5, 0 8px 16px rgba(0, 0, 0, 0.8);
+}
+
+.sk-recessed {
+  background-color: #070709;
+  border: 1px solid #1f1f23;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.9);
+  border-radius: 6px;
+}
+
+.sk-btn-primary {
+  background-color: #f4f4f5;
+  color: #09090b;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid #ffffff;
+  box-shadow: 0 2px 0 #a1a1aa, 0 4px 8px rgba(0, 0, 0, 0.4);
+  transition: all 0.1s ease;
+}
+
+.sk-btn-primary:hover {
+  background-color: #ffffff;
+}
+
+.sk-btn-primary:active {
+  transform: translateY(2px);
+  box-shadow: 0 0 0 #a1a1aa, inset 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.sk-btn-secondary {
+  background-color: #18181b;
+  color: #f4f4f5;
+  border-radius: 6px;
+  border: 1px solid #27272a;
+  box-shadow: 0 2px 0 #09090b, inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: all 0.1s ease;
+}
+
+.sk-btn-secondary:hover {
+  background-color: #27272a;
+  border-color: #3f3f46;
+}
+
+.sk-btn-secondary:active {
+  transform: translateY(1px);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* Custom scrollbars for data feed */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #09090b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
+}
