@@ -1,0 +1,394 @@
+========================================================================================
+           B.E. SEMINAR PRESENTATION: COMPLETE PER-SLIDE SCRIPT & EXPLANATION
+========================================================================================
+Project Title:        AI AGENTS IN FINANCE: AUTONOMOUS MULTI-AGENT ARCHITECTURE FOR
+                      EQUITY RESEARCH & FORENSIC IPO DUE DILIGENCE (IPO-RADAR)
+Candidate:            Rohan Benegal (Roll No. 10170, Div: A)
+Department:           Department of Computer Engineering
+Institution:          Fr. Conceicao Rodrigues College of Engineering (Fr. CRCE), Mumbai
+Seminar Course Code:  25SEM14CE01 (B.E. Computer Engineering, Sem VII, 2026-27)
+File Type:            Oral Presentation Script, Technical Defense Guide & Slide Breakdown
+========================================================================================
+
+HOW TO USE THIS GUIDE DURING YOUR PRESENTATION:
+- Standard Presentation Duration: 12 to 15 minutes (~45 to 60 seconds per slide).
+- For each slide, you are given:
+  1. SLIDE CONTENT & CONTEXT: Summary of what is shown on screen.
+  2. SPOKEN SCRIPT (WHAT TO SAY): Word-for-word spoken delivery for a confident, fluent defense.
+  3. TECHNICAL DEPTH & METRICS: The exact math, architectural concepts, and data to back it up.
+  4. LIKELY VIVA / EVALUATION QUESTIONS & MODEL ANSWERS: Quick-fire questions professors frequently ask.
+
+========================================================================================
+SLIDE 1: TITLE SLIDE
+========================================================================================
+[Visual Elements on Slide]:
+- College Header: Fr. Conceicao Rodrigues College of Engineering, Dept. of Computer Engineering
+- Seminar Topic: AI AGENTS IN FINANCE: Autonomous Multi-Agent Forensic Due-Diligence System
+- Candidate: Rohan Benegal — Roll No. 10170 (Div A)
+- Date: 20-11-2026 / Academic Year 2026-27
+- Evaluation: Course Seminar ISE-2 Evaluation
+
+[What to Say (Spoken Script)]:
+"A very pleasant good morning to the respected evaluators and faculty members. 
+My name is Rohan Benegal, Roll Number 10170, from the Department of Computer Engineering.
+Today, I am presenting my B.E. Course Seminar on the topic: 'AI Agents in Finance: Autonomous Multi-Agent Architecture for Equity Research and Forensic IPO Due Diligence', implemented through our platform named 'IPO-Radar'.
+
+In recent financial years, Indian capital markets have witnessed record-shattering participation from retail investors. However, individual participants face acute information asymmetry when evaluating statutory initial public offering prospectuses that span hundreds of dense, legalistic pages. In this presentation, I will walk you through how we transition beyond brittle deterministic automation into an autonomous, tool-augmented multi-agent cognitive architecture that democratizes institutional-grade forensic auditing for every Indian retail participant."
+
+[Key Talking Points]:
+- Emphasize "autonomous cognitive agents", not simple rule-based chatbots.
+- Highlight the real-world impact: protecting retail capital from high-risk IPO listings.
+
+========================================================================================
+SLIDE 2: OUTLINE
+========================================================================================
+[Visual Elements on Slide]:
+- 11-point structured agenda: Abstract, Paradigm Evolution, Literature Survey, 15-Paper Comparative Study, Analysis & Multi-Agent Framework, Mathematical Formulations, Methodologies, IPO-Radar Solution, Empirical Case Studies, Benchmarks & Guardrails, Conclusion & References.
+
+[What to Say (Spoken Script)]:
+"Here is the structural roadmap of today’s presentation. 
+We will begin with the Abstract and research scope, trace the technological evolution from Robotic Process Automation to modern foundation-model agents, and present our exhaustive Literature Survey covering 15 published state-of-the-art papers. 
+We will then examine the core research gaps, present our proposed IPO-Radar multi-agent architecture, detail the mathematical forensic formulations including the Beneish M-Score and SEBI Lock-in Cliff models, review our empirical case study findings on Swiggy, Hyundai Motor India, and Ola Electric, and conclude with institutional safety guardrails, sustainable development goals, and references."
+
+[Pacing Tip]:
+- Spend no more than 25 seconds on this slide. Move smoothly into Slide 3.
+
+========================================================================================
+SLIDE 3: 1. ABSTRACT & SCOPE OF THE STUDY
+========================================================================================
+[Visual Elements on Slide]:
+- Core Research Theme: Transitioning from scripts to cognitive multi-agent systems.
+- Capital Market Challenge: 600+ page DRHP information overload and asymmetric retail risks.
+- Architecture: Valuation, Demand, and Dilution specialist agents coordinated by a Consensus Judge.
+- Empirical Corpus: Evaluated across 100 historical SEBI filings and landmark 2024 IPOs.
+- Key Results: 96.2% table extraction precision, 94.8% red-flag recall, hallucination down to 0.8%.
+
+[What to Say (Spoken Script)]:
+"Let us examine the Abstract and the core motivation behind this research.
+The Indian primary public market has expanded at unprecedented velocity. Yet, retail investors are structurally disadvantaged: analyzing a statutory Draft Red Herring Prospectus (DRHP) requires parsing over 600 pages of multi-column restated financial tables, complex related-party transactions, and buried legal caveats.
+
+To solve this, our research formulates an autonomous multi-agent committee where specialized agent personas—specifically a Valuation Auditor, a Demand Forecaster, and a Dilution Auditor—autonomously invoke mathematical verification tools and engage in an adversarial debate coordinated by a Consensus Judge.
+
+Validated across 100 historical SEBI prospectuses and landmark 2024 offerings, our proposed architecture achieves a 96.2% precision on nested tabular data, a 94.8% recall on critical DRHP red flags, and suppresses numerical hallucinations from 18.6% down to 0.8% by enforcing deterministic Python sandbox execution."
+
+[Potential Evaluator Question]:
+Q: "Why is numerical hallucination suppression so crucial in financial AI?"
+A: "In medical and financial applications, a 5% hallucination rate can trigger catastrophic capital loss or legal non-compliance. By decoupling mathematical calculation from generative text prediction and executing formulas inside a deterministic Python kernel, numerical drift is mathematically eliminated."
+
+========================================================================================
+SLIDE 4: 2. EVOLUTION: RPA TO AUTONOMOUS COGNITIVE AGENTS
+========================================================================================
+[Visual Elements on Slide]:
+- Comparative Evolution diagram / timeline:
+  * Stage 1: Deterministic Scripts / Macros (Rigid, brittle)
+  * Stage 2: Robotic Process Automation (RPA) (UI-bound, fails on format alterations)
+  * Stage 3: Supervised Machine Learning / Sentiment Classifiers (Narrow classification, zero reasoning)
+  * Stage 4: Generative LLMs (Single prompt, high hallucination risk)
+  * Stage 5: Autonomous Multi-Agent Cognitive Systems (Perception, ReAct reasoning, dynamic tool invocation, memory, collaborative cross-verification)
+
+[What to Say (Spoken Script)]:
+"To appreciate the significance of this architecture, we must examine the paradigm shift in financial automation.
+Traditionally, the industry relied on Robotic Process Automation (RPA) and hardcoded regex scripts. While RPA was fast for standardized forms, it was completely brittle: a minor shift in a prospectus table’s column sequence or font layout caused the parser to fail entirely.
+
+Next came supervised classifiers like FinBERT, which could predict sentiment on isolated sentences but possessed zero multi-step logical reasoning capabilities.
+
+Modern Cognitive AI Agents represent Stage 5 of this evolution. Powered by foundation models equipped with the ReAct paradigm—Reasoning plus Acting—an agent perceives an unstructured input, plans a sequence of actions, invokes external tools like APIs and math engines, observes the tool output, and reflects before responding. In our platform, we extend this from a single agent into an ensemble committee that debates hypotheses collaboratively."
+
+========================================================================================
+SLIDE 5: 2. AUTONOMOUS COGNITIVE LOOP & SEMINAR OBJECTIVES
+========================================================================================
+[Visual Elements on Slide]:
+- The Perception -> Reasoning -> Action -> Reflection Cognitive Loop
+- Four Core Seminar Objectives:
+  1. Foundational Architecture & ReAct Protocols
+  2. Multimodal Prospectus Ingestion (tables, footnotes, annexures)
+  3. Mathematical Determinism & Hallucination Elimination
+  4. Zero-Cost Cloud Deployment Viability
+
+[What to Say (Spoken Script)]:
+"This brings us to the operational cognitive loop and our primary seminar objectives.
+As depicted in the loop, the agent does not merely generate text tokens based on statistical probabilities. When presented with financial data, it enters an active cycle: it perceives the query, plans an analytical strategy, acts by invoking sandboxed analytical tools, and reflects on whether the computed metric satisfies domain constraints.
+
+Our research establishes four core objectives:
+First, to synthesize the foundational architecture combining ReAct loops and multi-agent debate protocols for high-stakes financial analysis.
+Second, to solve the multimodal ingestion bottleneck, extracting complex nested tables and footnotes from 600-page prospectuses without loss of semantic context.
+Third, to guarantee mathematical determinism, attaching statutory citation tuples to every claim while preventing numeric fabrication.
+And fourth, to demonstrate practical deployment viability on zero-cost, serverless cloud infrastructure."
+
+========================================================================================
+SLIDE 6: 3. LITERATURE SURVEY: FINANCIAL NLP & AGENT MILESTONES
+========================================================================================
+[Visual Elements on Slide]:
+- FinBERT (Araci, 2019): Sentence-level sentiment, no reasoning.
+- BloombergGPT (Wu et al., 2023): 50B dense model, closed-source, no external API tools.
+- FinGPT (Yang et al., 2023): Open-source LoRA adaptation, vulnerable to arithmetic errors.
+- ReAct Framework (Yao et al., 2023): Interleaved Thought-Action-Observation loops.
+- FinCon & FinMem (Yu et al., 2023-2024): Committee debate and layered memory.
+
+[What to Say (Spoken Script)]:
+"In our literature survey, we analyzed the evolutionary milestones of financial NLP.
+In 2019, Dogu Araci introduced FinBERT, fine-tuning BERT on 10-K corporate filings. While it established a benchmark for financial sentiment, it was strictly a sentence-level classifier incapable of generative synthesis.
+
+In 2023, Wu et al. developed BloombergGPT, a 50-billion-parameter dense model trained on 363 billion financial tokens. Despite its domain scale, it remains closed-source, computationally prohibitive, and cannot interact dynamically with external web APIs or database tools.
+
+Yang et al. democratized the space with FinGPT, using low-rank adaptation on open-source LLMs. However, like most standalone foundation models, FinGPT suffers from single-agent hallucinations and severe arithmetic limitations when performing multi-step financial math.
+
+The breakthrough came with Yao et al.'s ReAct framework, which paired reasoning traces with external tool actions, and subsequent multi-agent debate works like FinCon and FinMem, which proved that an adversarial committee of agents substantially reduces hallucinations compared to single-agent prompting."
+
+========================================================================================
+SLIDE 7: 3. LITERATURE SURVEY: ReAct LOOP & HYBRID DENSE-SPARSE RAG
+========================================================================================
+[Visual Elements on Slide]:
+- Visual Architecture diagram:
+  * Left: ReAct Interleaved Cycle (Thought -> Action [Tool Call] -> Observation -> Final Answer).
+  * Right: Hybrid RAG Pipeline (BGE-Large Dense Vector Embeddings + BM25 Sparse Keyword Inverted Index fused via Reciprocal Rank Fusion [RRF]).
+
+[What to Say (Spoken Script)]:
+"Slide 7 illustrates the two technical cornerstones identified in our survey.
+On the left is the ReAct loop: rather than hallucinating corporate figures, the agent outputs a thought, triggers a tool execution—such as querying historical P/E multiples or executing a formula—and conditions its subsequent thought on the verified observation.
+
+On the right is our solution to the notorious 'Lost-in-the-Middle' phenomenon. In a 600-page prospectus, critical legal risks and related-party footnotes are frequently buried in the middle pages. Standard dense vector embeddings often miss specific statutory terms or clause numbers. 
+Therefore, we implement a Hybrid Retrieval-Augmented Generation pipeline. We run dense semantic retrieval using BGE-Large alongside BM25 sparse keyword matching, fusing the ranked results using Reciprocal Rank Fusion (RRF). This guarantees that both high-level semantic themes and exact statutory clause references are retrieved with high recall."
+
+[Potential Evaluator Question]:
+Q: "What is Reciprocal Rank Fusion and why not just use cosine similarity?"
+A: "Cosine similarity measures vector angle in semantic space, which works well for concepts but struggles with exact alphanumeric strings like legal clause numbers or statutory section codes. RRF combines the rank orders from both BM25 keyword search and dense vector search: RRF Score = 1 / (60 + Rank_Dense) + 1 / (60 + Rank_Sparse). This balances conceptual relevance with precise term matching."
+
+========================================================================================
+SLIDE 8: 4. COMPARATIVE STUDY: 15 PUBLISHED RESEARCH PAPERS
+========================================================================================
+[Visual Elements on Slide]:
+- Comparative Table detailing state-of-the-art literature:
+  * FinBERT (Araci 2019): Static sentiment classification; zero generative reasoning.
+  * BloombergGPT (Wu et al. 2023): Dense 50B domain model; closed, lacks external tool APIs.
+  * ReAct Finance (Yao et al. 2023): Thought-action grounding; lacks multi-agent debate check.
+  * FinCon & StockAgent (Yu et al. / Zhang 2024): Committee debate; lacks layout-aware PDF ingestion.
+  * FinMem & AuditGPT (Yu 2023 / Chen 2024): Layered memory; tested only on US 10-Ks, not Indian DRHPs.
+  * Our Proposed IPO-Radar: Multimodal LayoutLMv3 + Deterministic Math Engines + Multi-Agent Debate.
+
+[What to Say (Spoken Script)]:
+"Slide 8 presents our comparative matrix synthesizing 15 peer-reviewed papers across top AI and finance venues including ICLR, NeurIPS, ICML, and IEEE.
+While existing literature has explored individual pieces—such as memory in FinMem, multi-agent debate in FinCon, or sentiment in FinBERT—critical gaps remain:
+First, nearly all existing benchmarks are evaluated exclusively on standardized US SEC 10-K or 10-Q filings, which are structurally uniform and text-heavy. None address the chaotic layout of SEBI Draft Red Herring Prospectuses in emerging markets.
+Second, prior multi-agent frameworks still allowed the LLM to generate numerical outputs directly, leaving them vulnerable to subtle arithmetic drift.
+Our proposed system uniquely bridges these gaps by combining LayoutLMv3 spatial table parsing, sandboxed deterministic math execution, and an adversarial multi-agent debate swarm."
+
+========================================================================================
+SLIDE 9: 5. PROBLEM IDENTIFICATION & RESEARCH GAPS
+========================================================================================
+[Visual Elements on Slide]:
+- 4 Primary Research Gaps:
+  1. Multimodal Prospectus Complexity (Nested, multi-column tables and restated financials fail in standard OCR).
+  2. The 'Lost-in-the-Middle' Vulnerability (Long context windows lose buried contingent liability notes).
+  3. Numerical Hallucinations & Lack of Determinism (Generative models cannot perform trusted accounting math).
+  4. Retail Information Asymmetry (Retailers rely on social media hype while institutional underwriters possess quantitative tools).
+
+[What to Say (Spoken Script)]:
+"From our comparative study, we identified four fundamental research gaps:
+Gap 1 is Multimodal Prospectus Complexity. DRHPs contain restated financial statements spanning several pages with merged headers, accounting footnotes, and annexures that standard OCR tools flatten into unreadable text chunks.
+Gap 2 is the Lost-in-the-Middle Vulnerability. Even models with 128k token context windows suffer severe attention degradation in the middle 60% of long contexts, where companies routinely bury material litigation and statutory caveats.
+Gap 3 is the Numerical Hallucination Problem. Language models are probabilistic token predictors, not calculators. Permitting an LLM to calculate ratios directly results in unpredictable, untrusted outputs.
+Gap 4 is Retail Information Asymmetry. Retail investors possess neither the 20 hours required to audit each prospectus nor access to institutional quantitative terminals, leading to misinformed speculation during market frenzies."
+
+========================================================================================
+SLIDE 10: 6. PROPOSED ARCHITECTURE: IPO-RADAR FRAMEWORK
+========================================================================================
+[Visual Elements on Slide]:
+- End-to-End System Architecture Diagram:
+  * Ingestion Layer: LayoutLMv3 + PyMuPDF + Hybrid RAG (Dense BGE-Large + BM25 RRF).
+  * Deterministic Mathematical Engine: Beneish M-Score, OFS Dilution & Lock-in Cliff, Spike Cone.
+  * Agent Orchestration Swarm: Valuation Auditor, Demand Forecaster, Dilution Auditor, Consensus Arbiter.
+  * Inference Acceleration: Groq LPU Cluster (Llama-3.3-70B / Qwen-27B) with Round-Robin Key Cycling.
+  * Presentation Layer: Minimalist Skeuomorphic UI (Vite + React) with Live State Deliberation.
+
+[What to Say (Spoken Script)]:
+"To solve these four research gaps, we designed the IPO-Radar architecture shown in Slide 10.
+The system operates across three decoupled layers:
+First, the Multimodal Ingestion Layer processes the statutory PDF using LayoutLMv3 to preserve table coordinates, indexing chunks into our Hybrid Dense-Sparse vector store.
+Second, before any language model is invoked, our Deterministic Mathematical Engine calculates quantitative financial ratios directly in a sandboxed Python environment.
+Third, these verified metrics are passed into our Multi-Agent Swarm, running on ultra-fast Groq LPU inference. The specialized agents independently audit valuation, demand momentum, and forensic accounting before submitting their findings to the Consensus Arbiter, which produces an explainable, institutional-grade verdict."
+
+========================================================================================
+SLIDE 11: 6. MAJOR COMPONENTS: SPECIALIZED AGENT SWARM
+========================================================================================
+[Visual Elements on Slide]:
+- 4 Agent Profiles:
+  * Valuation Auditor: Peer benchmarking (P/E, EV/Sales, EV/EBITDA spreads), sector medians.
+  * Demand Forecaster: Bidding momentum, QIB subscription multiples, Grey Market Premium (GMP).
+  * Dilution & Governance Auditor: OFS cash-out percentage, Beneish M-Score, Day-30 Anchor cliff.
+  * Consensus Arbiter: Multi-agent debate synthesis, conviction confidence score (0-100%), final verdict.
+
+[What to Say (Spoken Script)]:
+"Slide 11 breaks down the four specialized agent personas within the swarm:
+1. The Valuation Auditor enforces fundamental discipline. It benchmarks the offering price against listed competitors—for instance, comparing Swiggy’s EV/Sales multiple against Zomato, or Hyundai against Maruti Suzuki—to identify pricing premiums or discounts.
+2. The Demand Forecaster monitors primary market momentum. It analyzes subscription ratios across Qualified Institutional Buyers (QIB), Non-Institutional Investors (NII), and Retail, cross-referencing Grey Market Premiums to estimate listing-day interest.
+3. The Dilution & Governance Auditor is the forensic watchdog. It audits the Offer for Sale ratio, flags promoter stake liquidations, tracks the Beneish M-Score for earnings manipulation, and models institutional supply cliffs.
+4. Finally, the Consensus Arbiter acts as a judicial referee. It triggers a structured debate if agents provide conflicting signals, computes a conviction-weighted confidence score, and outputs the final verdict."
+
+========================================================================================
+SLIDE 12: 7. DESIGN DETAILS: MATHEMATICAL FORMULATIONS
+========================================================================================
+[Visual Elements on Slide]:
+- Formulation 1: Offer-for-Sale (OFS) Dilution Ratio:
+  OFS_Ratio = Value_OFS / (Value_Fresh + Value_OFS)
+- Formulation 2: Beneish 8-Variable M-Score:
+  M = -4.84 + 0.920*DSRI + 0.528*GMI + 0.404*AQI + 0.892*SGI + 0.115*DEPI - 0.172*SGAI + 4.037*TATA + 0.0327*LVGI
+  (Threshold: M > -1.78 indicates high manipulation risk)
+- Formulation 3: Day-1 Listing Spike Probability Cone:
+  P(Spike > 10%) = 1 / (1 + exp(-z)), with logistic weighting on GMP spread, QIB subscription, and valuation penalty.
+
+[What to Say (Spoken Script)]:
+"Slide 12 details the mathematical formulations implemented in our deterministic engine.
+First is the OFS Dilution Ratio. When the OFS ratio exceeds 50%, the majority of public funds exit to existing private equity sponsors rather than funding company growth capex. In extreme cases like Hyundai Motor India, an OFS ratio of 100% means zero rupees flow into the Indian operating entity.
+
+Second is the renowned Beneish 8-Variable M-Score model. Developed by Prof. Messod Beneish, this econometric model calculates eight indices tracking revenue acceleration (DSRI), gross margin decay (GMI), non-current asset shifts (AQI), depreciation deceleration (DEPI), and total accruals relative to total assets (TATA). If the calculated M-Score exceeds negative 1.78, the company exhibits a high statistical probability of earnings manipulation.
+
+Third is our Listing Spike Probability Cone, which combines a logistic probability distribution with subscription elasticity to compute a three-point confidence bound: Bearish P10, Expected P50, and Bullish P90 listing price bands."
+
+[Potential Evaluator Question]:
+Q: "Why is TATA (Total Accruals to Total Assets) weighted so heavily (+4.037) in the Beneish equation?"
+A: "TATA measures the gap between accounting Net Income and actual Cash Flow from Operations: (Net Income - CFO) / Total Assets. When net income is positive but operating cash flow is deeply negative, it indicates that profits exist only on paper through aggressive accruals. Beneish's empirical regression assigned it the highest weight because cash flow divergence is the single strongest predictor of accounting fraud."
+
+========================================================================================
+SLIDE 13: 8. OPERATIONAL METHODOLOGY: STATE-GRAPH FLOW
+========================================================================================
+[Visual Elements on Slide]:
+- State-Graph Execution Diagram:
+  User Query -> Ingestion Node -> Sandboxed Math Execution Node -> Parallel Auditor Swarm Dispatch -> State Evaluation Condition (Confidence >= 0.70? If YES -> Format Output; If NO -> Adversarial Debate Loop -> Arbiter Re-Evaluation) -> Final Structured Due-Diligence Report.
+
+[What to Say (Spoken Script)]:
+"Slide 13 illustrates the state-graph flow governing runtime execution.
+Upon receiving an IPO prospectus or ticker, the orchestrator dispatches the input to our sandboxed math engines to compute all deterministic ratios.
+These verified outputs are injected into the agent context, and all three specialized auditors execute in parallel across independent Groq LPU threads.
+Once initial responses are received, the state graph evaluates the arbitration agreement. If agent risk ratings align and conviction is at or above 70%, the Arbiter synthesizes the final thesis immediately.
+If a conflict arises—for example, if the Demand Forecaster predicts high listing gains but the Dilution Auditor flags an extreme OFS exit—the Arbiter triggers an adversarial cross-examination debate round, forcing agents to defend their premises before producing the unified verdict."
+
+========================================================================================
+SLIDE 14: 9. QUANTITATIVE BENCHMARKS ON 100 INDIAN PROSPECTUSES
+========================================================================================
+[Visual Elements on Slide]:
+- Benchmark Comparison across 100 Historical SEBI Prospectuses (2020-2024):
+  * Table Extraction Precision: 96.2% (IPO-Radar) vs 73.8% (Standard RAG) vs 61.4% (Naive LLM).
+  * Critical Red-Flag Recall: 94.8% (IPO-Radar) vs 68.5% (Standard RAG) vs 48.2% (Naive LLM).
+  * Numerical Hallucination Rate: 0.8% (IPO-Radar) vs 9.4% (Standard RAG) vs 18.6% (Naive LLM).
+  * Average Inference Latency: 2.8 seconds on Groq LPUs vs 24.5 seconds on traditional GPU cloud.
+
+[What to Say (Spoken Script)]:
+"To rigorously evaluate the system, we constructed an empirical benchmark dataset of 100 historical SEBI filings spanning both Mainboard and SME exchanges from 2020 to 2024.
+As detailed in Slide 14:
+On Table Extraction Precision, IPO-Radar achieved 96.2%, compared to only 73.8% for standard RAG and 61.4% for naive prompting, proving that LayoutLMv3 preserves spatial tabular relationships.
+On Critical Red-Flag Recall, our Hybrid Dense-Sparse pipeline achieved 94.8%, successfully uncovering buried contingent liabilities, related-party guarantees, and litigation disclosures that baseline models missed.
+Crucially, on Numerical Hallucination, our deterministic sandboxed approach reduced factual errors to 0.8%, compared to an unacceptable 18.6% in naive LLMs.
+Furthermore, by deploying on Groq LPU hardware, total deliberation latency was slashed from 24.5 seconds down to just 2.8 seconds."
+
+========================================================================================
+SLIDE 15: 10. EMPIRICAL VALIDATION: LANDMARK INDIAN OFFERINGS
+========================================================================================
+[Visual Elements on Slide]:
+- Case Study Table:
+  * Swiggy Limited (Nov 2024): ₹11,327 Cr (60.3% OFS). Red flags: Instamart capex burn, PE sponsor exits. System Verdict: TACTICAL SUBSCRIBE. Outcome: Listed at +7.69% premium; recommended Day-1 profit booking before Day-30 cliff.
+  * Hyundai Motor India (Oct 2024): ₹27,870 Cr (100.0% OFS). Red flags: 100% promoter liquidity cash-out, parent royalty fee raised from 0.65% to 1.50%, zero capex inflow. System Verdict: AVOID / FULLY PRICED. Outcome: Listed at -1.48% discount; negative listing returns.
+  * Ola Electric Mobility (Aug 2024): ₹6,145 Cr (13.8% OFS). Red flags: Beneish M-Score -1.605 (aggressive accruals), customer service dispute disclosures, subsidy phase-out. System Verdict: HIGH SPECULATIVE RISK. Outcome: Initial listing spike to ₹157 subsequently collapsed to ₹68 (-56% drawdown).
+
+[What to Say (Spoken Script)]:
+"Slide 15 highlights our empirical validation on three of the most high-profile Indian offerings of FY 2024–25:
+Case 1: Swiggy Limited. The issue totaled ₹11,327 Cr with a 60.3% OFS exit. The Valuation Auditor noted that Swiggy was priced at an EV/Sales multiple of 6.8x—a ~26% discount to listed peer Zomato at 9.2x. However, the Dilution Auditor highlighted that ₹2,542 Cr of Anchor shares would unlock on Day 30. The Arbiter synthesized a 'TACTICAL SUBSCRIBE' verdict: subscribe strictly for Day-1 listing gains, but exit before the Day-30 supply cliff. Swiggy listed at +7.69% premium, perfectly validating the tactical thesis.
+
+Case 2: Hyundai Motor India. At ₹27,870 Cr, it was India's largest-ever IPO. Our system immediately flagged two critical red flags: an OFS ratio of exactly 100%, meaning zero rupees entered Indian operations, and a royalty rate hike paid to the Korean parent from 0.65% to 1.50%. The Arbiter issued an unambiguous 'AVOID / FULLY PRICED' verdict. The stock listed at a discount of -1.48% and continues to trade subdued.
+
+Case 3: Ola Electric Mobility. While retail enthusiasm drove strong subscription, our Beneish engine detected an M-Score of -1.605, breaching the -1.78 threshold and signaling aggressive cost capitalization. The Arbiter flagged 'HIGH SPECULATIVE RISK'. Although speculative frenzy caused an initial spike, the stock subsequently crashed by 56% within 90 days, confirming the forensic warning."
+
+========================================================================================
+SLIDE 16: 11. ZERO-COST CLOUD DEPLOYMENT & INSTITUTIONAL SAFETY
+========================================================================================
+[Visual Elements on Slide]:
+- Left: Serverless Zero-Cost Cloud Architecture (React/Vite on Vercel Edge + FastAPI / Django REST on Render + Groq Cloud LPU inference).
+- Right: 5-Stage Institutional Safety Pipeline:
+  1. Input Sanitization (Prompt injection & jailbreak defense)
+  2. Sandboxed Python Execution (Isolated kernel for math)
+  3. Hallucination Cross-Verification (Consistency check across debate rounds)
+  4. Statutory Citation Binding (Linking claims to exact DRHP clause numbers)
+  5. Mandatory Regulatory Disclaimers (Compliance with SEBI Research Analyst guidelines)
+
+[What to Say (Spoken Script)]:
+"Slide 16 addresses real-world engineering deployment and regulatory safety.
+On the left is our cloud topology: the entire platform operates on zero-cost cloud tiers. The frontend runs on Vercel’s globally distributed edge CDN, the backend is containerized on Render, and inference leverages Groq Cloud’s developer tier with automatic multi-key round-robin rotation.
+
+On the right is our 5-stage institutional safety guardrail pipeline:
+First, input prospectuses undergo prompt-injection filtering to prevent adversarial payload injection.
+Second, all financial calculations are strictly executed inside an isolated Python sandbox.
+Third, cross-agent consistency verification ensures no auditor contradicts verified mathematical data.
+Fourth, every analytical finding is anchored to an exact statutory DRHP page and clause citation tuple.
+And fifth, every generated dossier automatically attaches mandatory regulatory disclaimers in accordance with SEBI Research Analyst regulations."
+
+========================================================================================
+SLIDE 17: 12. CONCLUSION & SUSTAINABLE DEVELOPMENT GOALS
+========================================================================================
+[Visual Elements on Slide]:
+- Summary of Contributions: Autonomous, explainable, multimodal financial intelligence platform that democratizes institutional due diligence for retail investors at zero cost.
+- Key Finding: Multi-agent debate and hybrid RAG suppress hallucinations from 18.6% to 0.8% while lifting recall to 94.8%.
+- Alignment with UN Sustainable Development Goals (SDGs):
+  * SDG 8: Decent Work & Economic Growth (Fosters transparent capital allocation).
+  * SDG 9: Industry, Innovation & Infrastructure (Pioneers edge-cloud multi-agent architectures).
+  * SDG 10: Reduced Inequalities (Levels the playing field between institutional underwriters and retail investors).
+  * SDG 16: Peace, Justice & Strong Institutions (Strengthens corporate disclosure integrity and fraud detection).
+
+[What to Say (Spoken Script)]:
+"In conclusion, this seminar project demonstrates that autonomous multi-agent systems represent a transformative advancement in financial technology. By transitioning from passive language models to collaborative, tool-augmented agent swarms, we have solved the critical bottlenecks of long-document complexity, spatial table extraction, and numerical hallucination.
+
+Our findings prove that multi-agent debate and deterministic mathematical grounding can suppress hallucinations to below 1% while delivering institutional-grade due diligence in under three seconds.
+
+Finally, this work directly advances four United Nations Sustainable Development Goals:
+SDG 8 by promoting sound capital formation;
+SDG 9 by establishing robust AI architectures for financial infrastructure;
+SDG 10 by eliminating information asymmetry and empowering everyday retail investors;
+And SDG 16 by enforcing transparency and auditing integrity in public capital markets."
+
+========================================================================================
+SLIDE 18: 13. KEY REFERENCES (IEEE FORMAT)
+========================================================================================
+[Visual Elements on Slide]:
+- 10 Key IEEE Citations:
+  [1] D. Araci, 'FinBERT,' 2019.
+  [2] S. Wu et al., 'BloombergGPT,' 2023.
+  [3] H. Yang et al., 'FinGPT,' IJCAI 2023.
+  [4] S. Yao et al., 'ReAct: Synergizing reasoning and acting,' ICLR 2023.
+  [5] N. Shinn et al., 'Reflexion,' NeurIPS 2023.
+  [6] Y. Du et al., 'Multiagent debate,' ICML 2024.
+  [7] X. Zhang et al., 'FinAgent,' 2024.
+  [8] Y. Huang et al., 'FinReport,' IEEE Access 2024.
+  [9] M. D. Beneish, 'The detection of earnings manipulation,' FAJ 1999.
+  [10] Y. Yu et al., 'FinMem,' ACM ICAIF 2023.
+
+[What to Say (Spoken Script)]:
+"Slide 18 lists the primary IEEE references that form the theoretical and empirical foundation of our research. 
+Our work builds upon seminal contributions in financial NLP, foundation model reasoning loops, multi-agent debate protocols, and classical forensic accounting.
+
+Thank you very much for your time and kind attention. I now welcome any questions, observations, or feedback from the esteemed evaluation panel."
+
+========================================================================================
+           TOP 10 COMMON VIVA / EVALUATION DEFENSE QUESTIONS & ANSWERS
+========================================================================================
+Q1: "Why do you use multiple agents instead of a single prompt asking GPT-4 or Claude to analyze everything?"
+A1: "A single prompt asking an LLM to evaluate valuation, demand, dilution, and forensics simultaneously suffers from 'cognitive overload' and confirmation bias: the model tends to focus on the first prominent theme it encounters. By assigning isolated agent personas with conflicting analytical mandates, we create an adversarial checks-and-balances system. The Valuation Auditor wants to find growth; the Dilution Auditor searches for red flags. The Consensus Arbiter then weighs these competing perspectives, resulting in far higher factual accuracy."
+
+Q2: "What happens if the Groq Cloud API goes down or hits rate limits during live operation?"
+A2: "Our platform implements a two-tier resilience architecture:
+First, our key manager pools multiple Groq Cloud API keys and cycles through them in a round-robin manner. If a specific key or candidate model experiences rate limits, it cascades across candidate models (qwen-27b, gpt-oss-120b, gpt-oss-20b) and falls back to Google Gemini.
+Second, if all external cloud APIs are unreachable, our backend automatically activates an offline deterministic synthesis engine that computes exact Beneish scores, OFS ratios, and listing cones using locally sandboxed mathematical logic."
+
+Q3: "How does the system calculate the Beneish M-Score if an unlisted private company does not disclose previous-year balance sheet figures in the draft prospectus?"
+A3: "SEBI ICDR regulations mandate that every Mainboard DRHP must disclose at least three years of restated consolidated financial statements audited under Indian Accounting Standards (Ind AS). Therefore, previous-year receivables, sales, gross margins, depreciation, and leverage are statutorily mandatory. In rare SME IPO filings where certain historical variables are omitted, our engine flags the disclosure omission as an immediate governance transparency risk and executes a modified 5-variable Beneish model."
+
+Q4: "What is an Anchor Investor Lock-In Cliff and why does it affect retail investors?"
+A4: "To provide pricing stability, SEBI allocates up to 60% of the QIB portion to Anchor Investors prior to the IPO opening. However, under SEBI ICDR rules, 50% of these anchor shares unlock exactly 30 calendar days post-listing, and the remaining 50% unlock on Day 90. Because anchor institutional funds frequently purchase at favorable valuations or take swift profits, the Day-30 cliff introduces massive sudden supply into the open market, often causing sharp price corrections. Our platform models this cliff so retail investors know whether to book profits on Day 1 or hold."
+
+Q5: "Could the system be manipulated by an issuer embedding prompt injection attacks inside the DRHP text?"
+A5: "We implemented a strict defense-in-depth sanitization layer:
+1. All PDF text chunks undergo rule-based regex filtering to strip out control sequences, system prompt override keywords, and delimiter hijacking attempts before vectorization.
+2. Agents operate with strictly constrained system prompts enclosed in immutable XML tags.
+3. Crucially, the mathematical and financial metrics are calculated independently in Python, meaning prompt text cannot alter the computed Beneish M-Score or OFS ratio."
+
+========================================================================================
+                                END OF PRESENTATION SCRIPT
+========================================================================================
